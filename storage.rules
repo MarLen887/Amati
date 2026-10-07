@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// Imágenes de las tarjetas: cada estudiante solo puede ver y modificar las suyas.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{uid}/{allPaths=**} {
+      function owner() {
+        return request.auth != null
+          && request.auth.uid == uid
+          && request.auth.token.email_verified == true
+          && request.auth.token.email.lower().matches('^[^@]+@uvp[.]edu[.]mx$');
+      }
+      allow read, delete: if owner();
+      // Solo imágenes de hasta 2 MB (la app las comprime a ~150 KB)
+      allow create, update: if owner()
+        && request.resource.size < 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

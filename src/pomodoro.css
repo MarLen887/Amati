@@ -1,0 +1,124 @@
+/* =====================================================================
+   Amati — colibrí del saludo y Pomodoro suave
+   ===================================================================== */
+
+/* ---------- Colibrí animado ---------- */
+.greeting { margin: 0; }
+.nowrap { white-space: nowrap; }
+.hummingbird {
+  display: inline-flex; flex-shrink: 0; vertical-align: middle;
+  margin: -0.75rem 0 -1rem 0.3rem; /* no agranda la altura de la línea del saludo */
+  animation: hb-arrive 1.4s cubic-bezier(.2, .8, .3, 1) both, hb-hover 3.2s ease-in-out 1.4s infinite;
+}
+.hummingbird svg { overflow: visible; }
+.hb-tail { fill: var(--navy-dark); }
+.hb-belly { fill: var(--navy); }
+.hb-chest { fill: var(--coral); }
+.hb-head { fill: var(--navy); }
+.hb-eye { fill: var(--text); }
+.hb-beak { fill: var(--sand); }
+.hb-wing { transform-box: fill-box; transform-origin: 50% 100%; }
+.hb-wing-back { fill: color-mix(in srgb, var(--teal) 70%, var(--navy)); opacity: 0.75; animation: hb-flap 0.16s ease-in-out infinite alternate-reverse; }
+.hb-wing-front { fill: var(--teal); animation: hb-flap 0.16s ease-in-out infinite alternate; }
+.hummingbird:hover { animation-play-state: paused, paused; }
+.hummingbird:hover .hb-body { animation: hb-nod 0.6s ease; transform-origin: 40px 30px; }
+
+@keyframes hb-flap { from { transform: scaleY(1) rotate(0deg); } to { transform: scaleY(0.25) rotate(8deg); } }
+@keyframes hb-hover {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  30% { transform: translate(2px, -5px) rotate(-3deg); }
+  60% { transform: translate(-1px, -2px) rotate(2deg); }
+}
+@keyframes hb-arrive {
+  0% { opacity: 0; transform: translate(-60px, 18px) rotate(-12deg) scale(0.7); }
+  60% { opacity: 1; transform: translate(6px, -6px) rotate(4deg) scale(1.03); }
+  100% { opacity: 1; transform: translate(0, 0) rotate(0) scale(1); }
+}
+@keyframes hb-nod { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-10deg); } }
+
+/* ---------- Selector de tipo de sesión / opciones ---------- */
+.mode-switch {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.25rem; padding: 0.25rem;
+  background: var(--cream); border: 1px solid var(--line); border-radius: 999px;
+}
+.mode-switch button {
+  font: inherit; font-size: 0.9rem; font-weight: 500; border: 0; border-radius: 999px; cursor: pointer;
+  background: transparent; color: var(--muted); padding: 0.5rem 0.75rem;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  position: relative; overflow: hidden; transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+}
+.mode-switch button:hover { color: var(--text); }
+.mode-switch button.active { background: var(--surface); color: var(--navy); box-shadow: var(--shadow); }
+.mode-switch.compact { display: inline-grid; justify-self: start; }
+.mode-switch.compact button { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+
+/* ---------- Anillo del temporizador ---------- */
+.pomo-ring { position: relative; display: inline-grid; place-items: center; flex-shrink: 0; }
+.pomo-ring svg { position: absolute; inset: 0; }
+.pomo-track { stroke: var(--line); }
+.pomo-fill { stroke: var(--navy); transition: stroke-dashoffset 1s linear; }
+.pomo-ring.break .pomo-fill { stroke: var(--teal); }
+.pomo-ring-label { position: relative; font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+
+.pomo-status { display: inline-flex; align-items: center; gap: 0.5rem; }
+.pomo-status .small { font-variant-numeric: tabular-nums; }
+.align-start { align-self: flex-start; }
+
+.pomo-timeup {
+  display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+  background: var(--teal-soft); border-radius: 12px; padding: 0.65rem 0.85rem; font-size: 0.9rem;
+  animation: pop-in 0.45s cubic-bezier(.2, .9, .3, 1.25);
+}
+.pomo-timeup svg { color: var(--teal); }
+
+/* ---------- Pantalla de descanso ---------- */
+.pomo-break { text-align: center; }
+.pomo-break h1 { margin-top: 0.25rem; }
+.pomo-break-ring { display: grid; place-items: center; animation: breathe-ring 8s ease-in-out infinite; }
+.pomo-tip {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  color: var(--muted); margin: 0 auto; max-width: 34ch; animation: rise 0.6s ease both;
+}
+.pomo-tip svg { color: var(--teal); flex-shrink: 0; }
+@keyframes breathe-ring { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+/* ---------- Indicador flotante ---------- */
+.pomo-pill {
+  position: fixed; z-index: 15; right: 1rem; bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--surface); color: var(--text); text-decoration: none;
+  border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.5rem 0.35rem 0.4rem;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--navy) 18%, transparent);
+  font-size: 0.85rem; font-variant-numeric: tabular-nums;
+  animation: pop-in 0.4s cubic-bezier(.2, .9, .3, 1.25);
+  transition: transform 0.2s ease;
+}
+.pomo-pill:hover { transform: translateY(-2px); }
+.pomo-pill > svg { color: var(--navy); }
+.pomo-pill.break > svg { color: var(--teal); }
+.pomo-pill-cta { background: var(--navy); color: var(--on-accent); border-radius: 999px; padding: 0.15rem 0.6rem; font-weight: 600; font-size: 0.78rem; }
+@media (min-width: 760px) { .pomo-pill { bottom: 1.5rem; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-wing-back, .hb-wing-front { animation: none; }
+}
+
+/* ---------- Frase del día ---------- */
+.daily-quote {
+  margin: 0.6rem auto 0; max-width: 40ch; text-align: center;
+  font-size: 0.9rem; font-style: italic; line-height: 1.5;
+  color: var(--muted);
+  animation: quote-in 1.2s ease 0.5s both;
+}
+.daily-quote::before { content: '“'; }
+.daily-quote::after { content: '”'; }
+@keyframes quote-in { from { opacity: 0; transform: translateY(4px); letter-spacing: 0.02em; } to { opacity: 1; transform: none; letter-spacing: normal; } }
+
+/* Halo suave detrás del colibrí para que destaque */
+.hummingbird { position: relative; isolation: isolate; }
+.hummingbird::before {
+  content: ""; position: absolute; inset: 8%; border-radius: 50%; z-index: -1;
+  background: radial-gradient(circle, color-mix(in srgb, var(--teal) 28%, transparent), transparent 70%);
+  animation: halo 3.2s ease-in-out infinite;
+}
+@keyframes halo { 0%, 100% { transform: scale(0.9); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; } }

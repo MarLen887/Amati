@@ -1,0 +1,109 @@
+rules_version = '2';
+
+// Reglas de seguridad de Amati
+// - Solo cuentas @uvp.edu.mx con correo verificado acceden a datos de estudio.
+// - Cada estudiante solo puede leer/modificar sus propias materias, tarjetas y sesiones.
+// - Los datos de investigación (prueba piloto) se guardan con un ID anónimo y solo
+//   los administradores (colección `admins`, editable desde la consola) pueden leerlos.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function uvp() {
+      return signedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.lower().matches('^[^@]+@uvp[.]edu[.]mx$');
+    }
+    function verified() {
+      return uvp() && request.auth.token.email_verified == true;
+    }
+    function isOwner(uid) {
+      return verified() && request.auth.uid == uid;
+    }
+    function isAdmin() {
+      return verified()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower()));
+    }
+    function myAnonId() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.anonId;
+    }
+    function isText(v, max) {
+      return v is string && v.size() <= max;
+    }
+    function validSubject() {
+      let d = request.resource.data;
+      return isText(d.name, 80) && d.name.size() > 0 && isText(d.color, 20);
+    }
+    function validCard() {
+      let d = request.resource.data;
+      // Cada lado necesita texto o imagen
+      return isText(d.front, 2000) && (d.front.size() > 0 || d.get('frontImage', null) != null)
+        && isText(d.back, 4000) && (d.back.size() > 0 || d.get('backImage', null) != null)
+        && isText(d.topic, 80)
+        && d.subjectId is string
+        && d.dueDate is timestamp
+        && d.ease is number && d.interval is number && d.reps is number;
+    }
+    function validMood(v) {
+      return v == null || (v is int && v >= 1 && v <= 5);
+    }
+
+    // Perfil del usuario
+    match /users/{uid} {
+      allow read: if uvp() && request.auth.uid == uid;
+      allow create: if uvp() && request.auth.uid == uid
+        && request.resource.data.anonId is string
+        && request.resource.data.email == request.auth.token.email;
+      allow update: if uvp() && request.auth.uid == uid
+        && request.resource.data.anonId == resource.data.anonId
+        && request.resource.data.email == resource.data.email;
+      // Borrar mi cuenta: el propio usuario puede eliminar su perfil
+      allow delete: if uvp() && request.auth.uid == uid;
+
+      match /subjects/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validSubject();
+      }
+      match /cards/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validCard();
+      }
+      match /reviews/{id} {
+        allow read, create, delete: if isOwner(uid);
+        allow update: if false;
+      }
+      match /sessions/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && validMood(request.resource.data.get('moodBefore', null))
+          && validMood(request.resource.data.get('moodAfter', null));
+      }
+    }
+
+    // Datos anónimos de la prueba piloto (V de Gowin: registros)
+    match /research_sessions/{id} {
+      allow create: if verified() && request.resource.data.anonId == myAnonId()
+        && validMood(request.resource.data.get('moodBefore', null))
+        && validMood(request.resource.data.get('moodAfter', null));
+      allow update: if verified() && resource.data.anonId == myAnonId()
+        && request.resource.data.anonId == resource.data.anonId
+        && validMood(request.resource.data.get('moodBefore', null))
+        && validMood(request.resource.data.get('moodAfter', null));
+      allow read: if isAdmin();
+      allow delete: if false;
+    }
+    match /research_reviews/{id} {
+      allow create: if verified() && request.resource.data.anonId == myAnonId();
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // Lista de administradores (doc id = correo en minúsculas). Se edita desde la consola.
+    match /admins/{email} {
+      allow read: if verified() && request.auth.token.email.lower() == email;
+      allow write: if false;
+    }
+  }
+}
