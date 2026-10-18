@@ -1,0 +1,40 @@
+name: Recordatorios por correo
+
+on:
+  schedule:
+    - cron: '7 * * * *' # cada hora (GitHub puede retrasarlo unos minutos)
+  workflow_dispatch:
+    inputs:
+      test_email:
+        description: 'Opcional: envía solo un correo de prueba a esta dirección'
+        required: false
+
+concurrency:
+  group: reminders
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar dependencias
+        working-directory: scripts
+        run: npm install --no-audit --no-fund
+      - name: Enviar recordatorios
+        working-directory: scripts
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          APP_URL: ${{ vars.APP_URL }}
+          TEST_EMAIL: ${{ github.event.inputs.test_email }}
+        run: node send-reminders.mjs
