@@ -46,8 +46,39 @@ service cloud.firestore {
         && d.dueDate is timestamp
         && d.ease is number && d.interval is number && d.reps is number;
     }
-    function validMood(v) {
-      return v == null || (v is int && v >= 1 && v <= 5);
+    function validNote() {
+      let d = request.resource.data;
+      return isText(d.title, 200)
+        && d.type in ['feynman', 'cornell', 'outline', 'pq4r', 'sq3r', 'srl', 'libre']
+        && isText(d.subjectId, 100)
+        && isText(d.topic, 80)
+        && d.content is map
+        && d.get('collaboratorEmails', []) is list
+        && d.get('collaboratorEmails', []).size() <= 30;
+    }
+    // Apuntes compartidos: el dueño agrega correos en collaboratorEmails; quien esté en esa lista puede editar
+    function isCollabOf(data) {
+      return verified() && request.auth.token.email.lower() in data.get('collaboratorEmails', []);
+    }
+    function isCollab(uid, noteId) {
+      return isCollabOf(get(/databases/$(database)/documents/users/$(uid)/notes/$(noteId)).data);
+    }
+    function validLibro() {
+      let d = request.resource.data;
+      return d.kind in ['book', 'pdf'] && isText(d.title, 300) && isText(d.subjectId, 100)
+        && isText(d.author, 200) && isText(d.source, 40) && isText(d.description, 2000)
+        && d.authors is list && d.authors.size() <= 6;
+    }
+    function validTrivia() {
+      let d = request.resource.data;
+      return d.total is int && d.total >= 1 && d.total <= 50
+        && d.correct is int && d.correct >= 0 && d.correct <= d.total
+        && isText(d.category, 80);
+    }
+    function validClassNote() {
+      let d = request.resource.data;
+      return isText(d.title, 200) && isText(d.subjectId, 100) && isText(d.text, 150000)
+        && (d.get('file', null) == null || d.file is map);
     }
 
     // Perfil del usuario
@@ -70,27 +101,49 @@ service cloud.firestore {
         allow read, delete: if isOwner(uid);
         allow create, update: if isOwner(uid) && validCard();
       }
+      match /notes/{id} {
+        allow read: if isOwner(uid) || isCollabOf(resource.data);
+        allow delete: if isOwner(uid);
+        allow create: if isOwner(uid) && validNote();
+        allow update: if (isOwner(uid) && validNote())
+          || (isCollabOf(resource.data)
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'content', 'updatedAt'])
+              && validNote());
+
+        // Contenido Yjs (actualizaciones), presencia de cursores e historial: dueño y colaboradores
+        match /{sub}/{docId} {
+          allow read, create, update, delete: if sub in ['updates', 'presence', 'history']
+            && (isOwner(uid) || isCollab(uid, id));
+        }
+      }
+      match /libros/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validLibro();
+      }
+      match /trivia/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create: if isOwner(uid) && validTrivia();
+        allow update: if false;
+      }
+      match /classNotes/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validClassNote();
+      }
       match /reviews/{id} {
         allow read, create, delete: if isOwner(uid);
         allow update: if false;
       }
       match /sessions/{id} {
         allow read, delete: if isOwner(uid);
-        allow create, update: if isOwner(uid)
-          && validMood(request.resource.data.get('moodBefore', null))
-          && validMood(request.resource.data.get('moodAfter', null));
+        allow create, update: if isOwner(uid);
       }
     }
 
     // Datos anónimos de la prueba piloto (V de Gowin: registros)
     match /research_sessions/{id} {
-      allow create: if verified() && request.resource.data.anonId == myAnonId()
-        && validMood(request.resource.data.get('moodBefore', null))
-        && validMood(request.resource.data.get('moodAfter', null));
+      allow create: if verified() && request.resource.data.anonId == myAnonId();
       allow update: if verified() && resource.data.anonId == myAnonId()
-        && request.resource.data.anonId == resource.data.anonId
-        && validMood(request.resource.data.get('moodBefore', null))
-        && validMood(request.resource.data.get('moodAfter', null));
+        && request.resource.data.anonId == resource.data.anonId;
       allow read: if isAdmin();
       allow delete: if false;
     }

@@ -1,0 +1,31 @@
+/* Lector de PDF */
+.pdf-reader { display: grid; grid-template-columns: minmax(0, 1fr) 17rem; gap: 0.8rem; align-items: start; }
+.pdf-main { height: 78vh; min-height: 28rem; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+.pdf-notes { max-height: 78vh; overflow-y: auto; padding: 0.7rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.pdf-note-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }
+.pdf-note-list li { display: flex; flex-direction: column; gap: 0.35rem; padding: 0.5rem; border-radius: 10px; border: 1px solid var(--line); }
+.pdf-note-list li.on { border-color: var(--navy); background: var(--cream); }
+.pdf-quote { text-align: left; border: 0; background: none; padding: 0; color: var(--text); cursor: pointer; font: inherit; font-size: 0.85rem; }
+.pdf-target { position: absolute; z-index: 5; transform: translateY(6px); }
+.pdf-hl { background: #ffd93d; opacity: 0.4; cursor: pointer; mix-blend-mode: multiply; }
+.pdf-hl.on { opacity: 0.65; outline: 2px solid var(--navy); }
+.pdf-progress { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.pdf-progress > span { display: block; height: 100%; background: var(--navy); transition: width 0.3s; }
+@media (max-width: 860px) { .pdf-reader { grid-template-columns: 1fr; } .pdf-notes { max-height: none; } }
+
+/* Barra del lector: nada se parte en dos líneas y se acomoda en pantallas angostas */
+.pdf-main { min-width: 0; }
+.pdf-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25rem 0.6rem; width: 100%; padding: 0.2rem 0.4rem; }
+.pdf-tb-group { display: inline-flex; align-items: center; gap: 0.15rem; flex-wrap: nowrap; }
+.pdf-page-ind { display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap; font-size: 0.9rem; }
+.pdf-page-ind .rpv-core__textbox { width: 3rem; min-width: 0; text-align: center; padding: 0.2rem 0.3rem; }
+.pdf-page-ind .rpv-page-navigation__current-page-input { margin: 0; }
+.pdf-tb-zoom .rpv-zoom__popover-target { white-space: nowrap; }
+.rpv-default-layout__toolbar { height: auto; min-height: 2.5rem; }
+.rpv-default-layout__toolbar .rpv-core__minimal-button { flex-shrink: 0; }
+@media (max-width: 520px) { .pdf-tb-zoom .rpv-zoom__popover-target { display: none; } .pdf-main { min-height: 22rem; } }
+
+/* Escritorio: la nota con PDF usa casi todo el ancho de la pantalla (menos margen lateral) */
+.content:has(.classnote-resource) { max-width: min(1600px, 100%); padding-inline: 0.75rem; }
+@media (min-width: 1100px) { .content:has(.classnote-resource) { padding-inline: 1rem; } }
+@media (max-width: 520px) { .pdf-main .rpv-default-layout__sidebar { display: none; } }

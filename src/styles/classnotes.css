@@ -1,0 +1,157 @@
+/* =====================================================================
+   Amati — notas de clase (subida a Drive/Cloudinary + texto con Gemini)
+   ===================================================================== */
+
+.settings-link { color: var(--muted); border-radius: 999px; padding: 0.45rem; }
+.settings-link.active, .settings-link:hover { color: var(--navy); background: var(--teal-soft); }
+.narrow-wide { max-width: 720px; margin-inline: auto; width: 100%; }
+
+.upload-banner {
+  display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; text-decoration: none; color: var(--text);
+  background: color-mix(in srgb, var(--navy) 8%, var(--surface)); border: 1px dashed color-mix(in srgb, var(--navy) 45%, var(--line));
+  transition: transform 0.2s, border-color 0.2s;
+}
+.upload-banner:hover { transform: translateY(-2px); border-color: var(--navy); }
+.upload-banner > svg { color: var(--navy); flex-shrink: 0; }
+
+.dropzone {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; text-align: center;
+  padding: 2rem 1rem; border: 2px dashed var(--sand); border-radius: 16px; cursor: pointer; background: var(--cream);
+  transition: border-color 0.2s, background 0.2s; font-weight: 400;
+}
+.dropzone:hover, .dropzone.over { border-color: var(--navy); background: color-mix(in srgb, var(--navy) 7%, var(--surface)); }
+.dropzone > svg { color: var(--navy); }
+.dropzone.has-file { padding: 0.9rem; border-style: solid; border-color: var(--line); background: var(--surface); align-items: stretch; }
+.dropzone-file { display: flex; align-items: center; gap: 0.9rem; }
+.dropzone-file img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
+.dropzone-file .grow { display: flex; flex-direction: column; min-width: 0; }
+.dropzone-file strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.stage-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.stage-list li { display: flex; align-items: center; gap: 0.5rem; color: var(--muted); }
+.stage-list li.doing { color: var(--text); font-weight: 600; }
+.stage-list li.done { color: var(--teal); }
+.stage-list li.error { color: var(--danger); }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+
+.service-status { list-style: none; padding: 0; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.service-status li { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.7rem; border-radius: 10px; background: var(--cream); }
+.service-status li > span:nth-child(2) { flex: 1; min-width: 0; }
+.service-status .state { font-size: 0.75rem; font-weight: 600; }
+.service-status li.ok svg, .service-status li.ok .state { color: var(--teal); }
+.service-status li.off { opacity: 0.75; }
+.service-status li.off .state { color: var(--coral); }
+
+.classnote-grid { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr; gap: 0.8rem; }
+@media (min-width: 640px) { .classnote-grid { grid-template-columns: 1fr 1fr; } }
+.classnote-card { display: flex; gap: 0.8rem; padding: 0.8rem; text-decoration: none; color: var(--text); height: 100%; transition: transform 0.2s, border-color 0.2s; }
+.classnote-card:hover { transform: translateY(-2px); border-color: var(--navy); }
+.classnote-thumb { width: 84px; height: 84px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); flex-shrink: 0; background: var(--cream); }
+.classnote-thumb.empty { display: grid; place-items: center; color: var(--muted); }
+.classnote-body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.classnote-body strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.classnote-body .snippet { margin: 0.2rem 0; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.search-inline { position: relative; flex-direction: row; align-items: center; }
+.search-inline svg { position: absolute; left: 0.8rem; color: var(--muted); }
+.search-inline input { padding-left: 2.3rem; }
+
+.title-input { font-size: 1.5rem; font-weight: 650; border: 0; border-bottom: 2px solid var(--line); border-radius: 0; background: transparent; padding-left: 0; }
+.classnote-layout { display: grid; grid-template-columns: 1fr; gap: 1.25rem; align-items: start; }
+@media (min-width: 900px) {
+  .classnote-layout:has(.classnote-resource) { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .classnote-resource { position: sticky; top: 4.5rem; }
+}
+/* El lector de PDF dentro de la nota: anotaciones debajo del documento */
+.classnote-resource .pdf-reader { grid-template-columns: 1fr; }
+.classnote-resource .pdf-main { height: 72vh; }
+.classnote-resource .pdf-notes { max-height: 18rem; }
+.note-viewer { display: block; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--cream); }
+.note-viewer img { display: block; width: 100%; height: auto; }
+.note-viewer.pdf { width: 100%; height: 70vh; min-height: 420px; }
+.note-viewer.pdf-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 2.5rem 1rem; text-decoration: none; color: var(--text); text-align: center; }
+.note-viewer.pdf-link svg { color: var(--navy); }
+.note-viewer.pdf-link:hover { border-color: var(--navy); }
+
+/* ---------- Ajustes de adaptación a pantallas pequeñas ---------- */
+.classnote-grid { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) { .classnote-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.classnote-grid > li, .classnote-card { min-width: 0; }
+.tabs { overflow-x: auto; scrollbar-width: thin; }
+.tabs button { white-space: nowrap; flex-shrink: 0; }
+.technique-grid, .option-grid, .compare-grid, .card-pair, .outline-grid, .book-actions, .classnote-layout { min-width: 0; }
+.technique-grid { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) { .technique-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.technique-card, .book-card, .classnote-layout > * { min-width: 0; }
+.panel, .stack > *, .stack-lg > * { min-width: 0; }
+
+/* Barra superior en pantallas muy angostas (320–400 px): logo sin texto y espacios compactos */
+@media (max-width: 400px) {
+  .topbar { padding-inline: 0.6rem; gap: 0.4rem; }
+  .topbar-actions { gap: 0.25rem; }
+  .logo-text { display: none; }
+  .content { padding-inline: 0.85rem; }
+}
+
+/* Cornell en móvil: cada fila apila la pista sobre la nota */
+@media (max-width: 560px) {
+  .cornell-head { display: none; }
+  .cornell-row { grid-template-columns: minmax(0, 1fr); padding: 0.55rem; border: 1px solid var(--line); border-radius: 12px; gap: 0.4rem; }
+  .cornell-row .cornell-del { top: 0.3rem; right: 0.3rem; }
+  .cornell-row textarea:first-child { padding-right: 2.2rem; }
+}
+
+/* Tabletas (760–1039 px): con 6 secciones la barra superior no cabe; se conserva la barra inferior */
+@media (min-width: 760px) and (max-width: 1039px) {
+  .top-nav { display: none; }
+  .bottom-nav { display: grid; }
+  .content { padding-bottom: 6rem; }
+  .sticky-actions { bottom: 4.2rem; }
+  .create-label { display: inline; }
+}
+@media (min-width: 1040px) {
+  .top-nav { display: flex; }
+  .bottom-nav { display: none; }
+}
+
+/* ---------- Biblioteca y derechos de autor ---------- */
+.copyright-notice { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.7rem 0.9rem; border-radius: 12px; background: var(--coral-soft); border: 1px solid color-mix(in srgb, var(--coral) 40%, transparent); }
+.copyright-notice svg { color: var(--coral); flex-shrink: 0; margin-top: 0.1rem; }
+.copyright-notice p { margin: 0; font-size: 0.9rem; font-weight: 500; }
+.copyright-notice.compact { padding: 0.5rem 0.7rem; }
+.copyright-notice.compact p { font-size: 0.82rem; }
+.download-row { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.libro-item { display: flex; align-items: flex-start; gap: 0.8rem; padding: 0.8rem 1rem; flex-wrap: wrap; }
+.libro-cover { width: 48px; height: 68px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); flex-shrink: 0; }
+.libro-item .note-link { flex: 1 1 14rem; gap: 0.2rem; }
+.libro-actions { margin-left: auto; }
+.search-filters { align-items: center; }
+.inline-select { flex-direction: row; align-items: center; gap: 0.5rem; }
+.inline-select select { width: auto; }
+.file-pick { align-self: flex-start; cursor: pointer; }
+.src-pills { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.src-pills .src-pill { margin-left: 0; }
+
+/* Pestañas: sin barra vertical espuria (el -1px del botón activo la provocaba) */
+.tabs { overflow-y: hidden; }
+.tabs button { margin-bottom: 0; }
+
+/* Idiomas del buscador */
+.lang-filter { min-width: 0; }
+.tag.lang-tag { font-weight: 600; letter-spacing: 0.04em; }
+.link-btn { border: 0; background: none; padding: 0; color: var(--navy); text-decoration: underline; cursor: pointer; font: inherit; }
+.link-btn:disabled { opacity: 0.5; cursor: wait; }
+
+/* ---------- Quiz de práctica ---------- */
+.quiz-list { display: grid; gap: 1.25rem; padding-left: 1.25rem; }
+.quiz-options { display: grid; gap: 0.5rem; }
+.quiz-option {
+  display: flex; align-items: center; gap: 0.5rem; text-align: left; width: 100%;
+  padding: 0.6rem 0.8rem; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); color: var(--text); cursor: pointer; font: inherit;
+}
+.quiz-option:hover:not(:disabled) { background: var(--cream); }
+.quiz-option:disabled { cursor: default; }
+.quiz-option.correct { border-color: var(--teal); background: var(--teal-soft); }
+.quiz-option.wrong { border-color: var(--coral); }

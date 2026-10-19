@@ -1,13 +1,16 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
-import { ThemeProvider } from './context/ThemeContext.jsx';
-import './styles.css';
-import './animations.css';
-import './ui.css';
-import './pomodoro.css';
-import './features.css';
-import { installRipple } from './lib/ripple.js';
+import App from './app/App.jsx';
+import { ThemeProvider } from './core/context/ThemeContext.jsx';
+import './styles/base.css';
+import './styles/animations.css';
+import './styles/ui.css';
+import './styles/pomodoro.css';
+import './styles/features.css';
+import './styles/techniques.css';
+import './styles/classnotes.css';
+import './styles/redesign.css';
+import { installRipple } from './core/lib/ripple.js';
 
 installRipple();
 
