@@ -153,3 +153,19 @@ details:not([open]) > .tool-section-head { margin-bottom: 0; }
 .xl-grid .sql-table th.xl-rowhead { position: sticky; left: 0; }
 .xl-click { cursor: cell; }
 .xl-click:hover { background: color-mix(in srgb, var(--navy) 12%, transparent); }
+
+/* ---------- Diagramas, mapas y líneas de tiempo ---------- */
+.diagram-split { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 900px) { .diagram-split { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); } }
+.diagram-code { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.85rem; line-height: 1.5; resize: vertical; }
+.diagram-preview { overflow: auto; max-height: 36rem; display: grid; place-items: start center; padding: 0.5rem; border: 1px dashed var(--line); border-radius: 10px; background: var(--surface); }
+.diagram-preview svg { max-width: 100%; height: auto; }
+.markmap-svg { width: 100%; height: 30rem; border: 1px dashed var(--line); border-radius: 10px; background: var(--surface); }
+.markmap-svg, .markmap-svg.markmap { --markmap-text-color: var(--text) !important; --markmap-code-bg: var(--cream) !important; --markmap-code-color: var(--text) !important; color: var(--text); }
+.flow-canvas { height: 34rem; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+.flow-label input { width: 100%; }
+.timeline-host { height: 34rem; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.timeline-events { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+.timeline-event { display: grid; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.timeline-date { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 0.4rem; }
+.timeline-inner { width: 100%; height: 100%; }

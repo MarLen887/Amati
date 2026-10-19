@@ -1,83 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { CalendarX, Plus, Sparkles } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import { useAuth } from '../../core/context/AuthContext.jsx';
 import { useData } from '../../core/context/DataContext.jsx';
-import { createSampleSubject, createSubject, deleteSubject, updateSubject } from '../../core/data/db.js';
+import { createSampleSubject, createSubject } from '../../core/data/db.js';
 import { cardStatus, isDue } from '../techniques/cards/srs.js';
-import ColorPicker, { SUBJECT_COLORS } from '../../core/components/ColorPicker.jsx';
 import EmptyState from '../../core/components/EmptyState.jsx';
 import MoreMenu from '../../core/components/MoreMenu.jsx';
 import { ExamChip } from './ExamCountdown.jsx';
-
-// "AAAA-MM-DD" <-> Date en hora local
-const toInput = (d) =>
-  d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` : '';
-const fromInput = (v) => {
-  if (!v) return null;
-  const [y, m, d] = v.split('-').map(Number);
-  return new Date(y, m - 1, d);
-};
-
-function SubjectEditor({ initial, onSave, onCancel }) {
-  const [name, setName] = useState(initial?.name || '');
-  const [color, setColor] = useState(initial?.color || SUBJECT_COLORS[0]);
-  const [exam, setExam] = useState(toInput(initial?.examDate));
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-
-  async function submit(e) {
-    e.preventDefault();
-    if (!name.trim()) return;
-    setBusy(true);
-    setError('');
-    try {
-      await onSave({ name, color, examDate: fromInput(exam) });
-      if (!initial) {
-        setName('');
-        setExam('');
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form onSubmit={submit} className="subject-editor">
-      <label>
-        <span className="side-title">Nombre de la materia</span>
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej. Anatomía, Cálculo II, Historia de México"
-          maxLength={80} required autoFocus />
-      </label>
-      <div className="stack-sm">
-        <span className="field-label">Color <span className="muted">(para reconocerla rápido)</span></span>
-        <ColorPicker value={color} onChange={setColor} />
-      </div>
-      <details className="optional-images" open={Boolean(exam)}>
-        <summary><CalendarX size={16} aria-hidden="true" /> Fecha de examen <span className="muted">(opcional)</span></summary>
-        <div className="stack-sm">
-          <div className="row gap">
-            <input id={`exam-${initial?.id || 'new'}`} type="date" value={exam} min={toInput(new Date())}
-              aria-label="Fecha de examen" onChange={(e) => setExam(e.target.value)} className="grow" />
-            {exam && (
-              <button type="button" className="btn small ghost" onClick={() => setExam('')}>Quitar</button>
-            )}
-          </div>
-          <p className="small muted">Amati ajustará los repasos para que llegues preparado, sin desveladas.</p>
-        </div>
-      </details>
-      {error && <p className="error" role="alert">{error}</p>}
-      <div className="row gap end">
-        {onCancel && <button type="button" className="btn ghost" onClick={onCancel}>Cancelar</button>}
-        <button className="btn primary" disabled={busy || !name.trim()}>
-          {initial ? 'Guardar cambios' : busy ? 'Creando…' : 'Crear materia y agregar tarjetas →'}
-        </button>
-      </div>
-    </form>
-  );
-}
+import SubjectEditor from './SubjectEditor.jsx';
+import { DeleteSubjectModal, EditSubjectModal } from './SubjectModals.jsx';
 
 export function SampleButton({ className = 'btn ghost' }) {
   const { user } = useAuth();
@@ -135,17 +67,11 @@ export default function Subjects() {
   const { subjects, cards, loading, now } = useData();
   const nav = useNavigate();
   const [params, setParams] = useSearchParams();
-  const [editing, setEditing] = useState(null);
+  const [editing, setEditing] = useState(null); // materia que se edita en el modal
+  const [deleting, setDeleting] = useState(null); // materia que se elimina en el modal
   const [adding, setAdding] = useState(params.get('nueva') === '1');
 
   if (loading) return <p className="muted">Cargando…</p>;
-
-  async function remove(s) {
-    const n = cards.filter((c) => c.subjectId === s.id).length;
-    const what = s.sample ? 'la materia de ejemplo' : `"${s.name}"`;
-    if (!confirm(`¿Eliminar ${what}${n ? ` y sus ${n} tarjetas` : ''}? Esta acción no se puede deshacer.`)) return;
-    await deleteSubject(user.uid, s.id);
-  }
 
   return (
     <div className="stack-lg">
@@ -191,18 +117,13 @@ export default function Subjects() {
       )}
 
       <ul className="subject-grid">
-        {subjects.map((s) =>
-          editing === s.id ? (
-            <li key={s.id} className="panel">
-              <SubjectEditor initial={s}
-                onSave={async (d) => { await updateSubject(user.uid, s.id, d); setEditing(null); }}
-                onCancel={() => setEditing(null)} />
-            </li>
-          ) : (
-            <SubjectCard key={s.id} s={s} cards={cards} now={now} onEdit={() => setEditing(s.id)} onRemove={() => remove(s)} />
-          ),
-        )}
+        {subjects.map((s) => (
+          <SubjectCard key={s.id} s={s} cards={cards} now={now} onEdit={() => setEditing(s)} onRemove={() => setDeleting(s)} />
+        ))}
       </ul>
+
+      {editing && <EditSubjectModal subject={editing} onClose={() => setEditing(null)} />}
+      {deleting && <DeleteSubjectModal subject={deleting} onClose={() => setDeleting(null)} />}
     </div>
   );
 }

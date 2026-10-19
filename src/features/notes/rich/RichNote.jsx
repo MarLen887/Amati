@@ -16,7 +16,6 @@ import { CircleCheck, CloudOff, History, Loader2, Share2, Trash2 } from 'lucide-
 import 'katex/dist/katex.min.css';
 import '../../../styles/rich.css';
 import { useAuth } from '../../../core/context/AuthContext.jsx';
-import { useData } from '../../../core/context/DataContext.jsx';
 import { addVersion, deleteNote, saveRichSnapshot, setNoteMeta, watchNote } from '../../../core/data/db.js';
 import { FirestoreProvider } from './yFirestore.js';
 import { Drawing } from './ExcalidrawNode.jsx';
@@ -24,6 +23,7 @@ import Toolbar from './Toolbar.jsx';
 import MathDialog from './MathDialog.jsx';
 import SharePanel from './SharePanel.jsx';
 import HistoryPanel from './HistoryPanel.jsx';
+import SubjectSelect from '../../subjects/SubjectSelect.jsx';
 import GenerateResources from '../GenerateResources.jsx';
 
 const lowlight = createLowlight(common);
@@ -79,7 +79,6 @@ export default function RichNote({ ownerUid, noteId }) {
 }
 
 function Shell({ note, noteId, ownerUid, isOwner, collab, synced, sync, error, setError, nav, live, user }) {
-  const { subjects } = useData();
   const { ydoc, provider } = collab;
   const [title, setTitle] = useState(note.title);
   const [panel, setPanel] = useState(null); // 'share' | 'history'
@@ -181,10 +180,7 @@ function Shell({ note, noteId, ownerUid, isOwner, collab, synced, sync, error, s
           <div className="grid-2">
             <label>
               Materia
-              <select defaultValue={note.subjectId || ''} onChange={(e) => setNoteMeta(ownerUid, noteId, { subjectId: e.target.value, topic: note.topic || '' })}>
-                <option value="">Sin materia</option>
-                {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
+              <SubjectSelect value={note.subjectId || ''} onChange={(id) => setNoteMeta(ownerUid, noteId, { subjectId: id, topic: note.topic || '' })} />
             </label>
             <label>
               Tema (opcional)
@@ -223,7 +219,7 @@ function Shell({ note, noteId, ownerUid, isOwner, collab, synced, sync, error, s
 
       {isOwner && <GenerateResources getText={() => editor?.getText({ blockSeparator: ' ' }) || ''} title={title} subjectId={note.subjectId || ''} topic={note.topic || ''} />}
 
-      {panel === 'share' && isOwner && <SharePanel ownerUid={ownerUid} noteId={noteId} emails={note.collaboratorEmails || []} title={title} />}
+      {panel === 'share' && isOwner && <SharePanel ownerUid={ownerUid} noteId={noteId} emails={note.collaboratorEmails || []} title={title} onClose={() => setPanel(null)} />}
       {panel === 'history' && (
         <HistoryPanel
           ownerUid={ownerUid} noteId={noteId} user={user}

@@ -2,14 +2,15 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../core/context/AuthContext.jsx';
 import { useData } from '../../core/context/DataContext.jsx';
-import { createCard, deleteCard, deleteSubject, updateCard } from '../../core/data/db.js';
+import { createCard, deleteCard, updateCard } from '../../core/data/db.js';
 import { cardStatus, isDue } from '../techniques/cards/srs.js';
 import { fmtShort } from '../../core/lib/dates.js';
-import { CircleCheck, Compass, FileText, Lightbulb, PenLine, Plus, Search, Sparkles, Upload } from 'lucide-react';
+import { CircleCheck, Compass, FileText, Lightbulb, Pencil, PenLine, Plus, Search, Sparkles, Trash2, Upload } from 'lucide-react';
 import CardForm from './CardForm.jsx';
 import ImportCards from './ImportCards.jsx';
 import EmptyState from '../../core/components/EmptyState.jsx';
 import ExamCountdown from './ExamCountdown.jsx';
+import { DeleteSubjectModal, EditSubjectModal } from './SubjectModals.jsx';
 import { NotesList } from '../notes/Notes.jsx';
 import LibroList from '../library/LibroList.jsx';
 import MoreMenu from '../../core/components/MoreMenu.jsx';
@@ -83,6 +84,7 @@ export default function SubjectDetail() {
   const [tab, setTab] = useState(params.get('tab') === 'apuntes' ? 'notes' : params.get('tab') === 'recursos' ? 'resources' : params.get('tab') === 'clases' ? 'class' : 'cards');
   const [adding, setAdding] = useState(params.get('agregar') === '1');
   const [editing, setEditing] = useState(null);
+  const [modal, setModal] = useState(null); // 'edit' | 'delete'
   const [search, setSearch] = useState('');
   const [topicFilter, setTopicFilter] = useState('');
   const [importing, setImporting] = useState(false);
@@ -119,12 +121,6 @@ export default function SubjectDetail() {
     if (confirm('¿Eliminar esta tarjeta?')) await deleteCard(user.uid, c);
   }
 
-  async function removeSample() {
-    if (!confirm('¿Eliminar la materia de ejemplo y sus tarjetas?')) return;
-    await deleteSubject(user.uid, id);
-    navigate('/materias');
-  }
-
   const openAdd = () => { setAdding(true); setImporting(false); setTab('cards'); };
   const openImport = () => { setImporting(true); setImported(0); setAdding(false); setTab('cards'); };
 
@@ -138,6 +134,8 @@ export default function SubjectDetail() {
             {subject.name}
           </h1>
           <div className="row gap wrap">
+            {!subject.sample && <button type="button" className="btn ghost" onClick={() => setModal('edit')}><Pencil size={16} aria-hidden="true" /> Editar</button>}
+            {!subject.sample && <button type="button" className="btn ghost danger" onClick={() => setModal('delete')}><Trash2 size={16} aria-hidden="true" /> Eliminar</button>}
             {subjectCards.length > 0 && (
               <Link to={studyHref} className="btn primary">
                 <Compass size={16} aria-hidden="true" /> Estudiar{due > 0 ? ` (${due})` : ''}
@@ -153,7 +151,7 @@ export default function SubjectDetail() {
           <span className="grow">
             Esta es una <strong>materia de ejemplo</strong> para que pruebes Amati. Cuando quieras, elimínala y crea las tuyas.
           </span>
-          <button className="btn small ghost danger" onClick={removeSample}>Eliminar ejemplo</button>
+          <button className="btn small ghost danger" onClick={() => setModal('delete')}>Eliminar ejemplo</button>
         </div>
       )}
 
@@ -333,6 +331,9 @@ export default function SubjectDetail() {
           <NotesList subjectId={id} compact />
         </section>
       )}
+
+      {modal === 'edit' && <EditSubjectModal subject={subject} onClose={() => setModal(null)} />}
+      {modal === 'delete' && <DeleteSubjectModal subject={subject} onClose={() => setModal(null)} onDeleted={() => navigate('/materias')} />}
     </div>
   );
 }

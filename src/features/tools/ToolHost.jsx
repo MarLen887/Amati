@@ -23,6 +23,10 @@ const APPS = {
   inegi: lazy(() => import('./apps/Inegi.jsx')),
   excel: lazy(() => import('./apps/Excel.jsx')),
   dashboard: lazy(() => import('./apps/Dashboard.jsx')),
+  mermaid: lazy(() => import('./apps/Mermaid.jsx')),
+  markmap: lazy(() => import('./apps/Markmap.jsx')),
+  flow: lazy(() => import('./apps/FlowEditor.jsx')),
+  timeline: lazy(() => import('./apps/TimelineTool.jsx')),
 };
 
 export default function ToolHost() {

@@ -120,6 +120,13 @@ export async function deleteSubject(uid, id) {
   const notes = await getDocs(query(sub(uid, 'notes'), where('subjectId', '==', id)));
   const libros = await getDocs(query(sub(uid, 'libros'), where('subjectId', '==', id)));
   const classNotes = await getDocs(query(sub(uid, 'classNotes'), where('subjectId', '==', id)));
+  // Los apuntes libres guardan su contenido en subcolecciones, que no se borran solas
+  for (const n of notes.docs) {
+    for (const name of NOTE_SUBCOLLECTIONS) {
+      const snap = await getDocs(collection(db, 'users', uid, 'notes', n.id, name));
+      await commitInChunks(snap.docs.map((d) => d.ref), (batch, r) => batch.delete(r));
+    }
+  }
   const refs = [...cards.docs.map((d) => d.ref), ...notes.docs.map((d) => d.ref), ...libros.docs.map((d) => d.ref), ...classNotes.docs.map((d) => d.ref), doc(db, 'users', uid, 'subjects', id)];
   await commitInChunks(refs, (batch, r) => batch.delete(r));
 }

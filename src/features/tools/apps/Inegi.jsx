@@ -23,7 +23,7 @@ function parsePeriod(p) {
 }
 
 async function fetchSeries(id) {
-  const url = `${API}/${encodeURIComponent(id)}/es/00000/false/BIE/2.0/${TOKEN}?type=json`;
+  const url = `${API}/${encodeURIComponent(id)}/es/00000/false/BIE-BISE/2.0/${TOKEN}?type=json`;
   let res;
   try { res = await fetch(url); } catch { throw new Error('No se pudo conectar con el INEGI. Revisa tu conexión.'); }
   const json = await res.json().catch(() => null);

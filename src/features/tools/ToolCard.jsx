@@ -2,14 +2,14 @@ import { Link } from 'react-router-dom';
 import {
   Apple, ArrowLeftRight, MapPin, Sheet, ChartPie, BookOpenText, Shuffle, Database, GitBranch, LifeBuoy, Terminal, Atom, BookSearch, Bone, Briefcase, CalendarCheck, Calculator, ChartColumn, ChartLine, CircuitBoard,
   ClipboardList, Code, Cpu, Dna, FlaskConical, Globe, History, Landmark, Languages, LayoutDashboard, Music, Network, Palette,
-  Orbit, PenLine, Pill, Quote, Shapes, Sigma, SpellCheck, Star, Stethoscope, TrendingUp, Workflow, Wrench,
+  Orbit, PenLine, Pill, Quote, Shapes, Sigma, SpellCheck, Star, Stethoscope, TrendingUp, Waypoints, Workflow, Wrench,
 } from 'lucide-react';
 import { AREA_MAP, CATEGORY_MAP } from './tools.js';
 
 const ICONS = {
   Apple, ArrowLeftRight, MapPin, Sheet, ChartPie, BookOpenText, Shuffle, Database, GitBranch, LifeBuoy, Terminal, Atom, BookSearch, Bone, Briefcase, CalendarCheck, Calculator, ChartColumn, ChartLine, CircuitBoard,
   ClipboardList, Code, Cpu, Dna, FlaskConical, Globe, History, Landmark, Languages, LayoutDashboard, Music, Network, Palette,
-  Orbit, PenLine, Pill, Quote, Shapes, Sigma, SpellCheck, Stethoscope, TrendingUp, Workflow,
+  Orbit, PenLine, Pill, Quote, Shapes, Sigma, SpellCheck, Stethoscope, TrendingUp, Waypoints, Workflow,
 };
 
 export function ToolIcon({ name, size = 22 }) {

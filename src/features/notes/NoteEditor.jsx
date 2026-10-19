@@ -7,6 +7,7 @@ import { createCardsBulk, createRichNote, deleteNote, saveNote } from '../../cor
 import { GUIDES } from './guides.js';
 import { NOTE_TYPES, saveLastTechnique, TECHNIQUE_MAP } from '../techniques/techniques.js';
 import TechniqueIcon from '../techniques/TechniqueIcon.jsx';
+import SubjectSelect from '../subjects/SubjectSelect.jsx';
 import GuidedEditor from './GuidedEditor.jsx';
 import OutlineEditor from './OutlineEditor.jsx';
 import CornellEditor from './CornellEditor.jsx';
@@ -20,7 +21,6 @@ const emptyContent = (type, source = '') =>
 
 function NoteForm({ initial, type }) {
   const { user } = useAuth();
-  const { subjects } = useData();
   const nav = useNavigate();
   const [params] = useSearchParams();
   const tech = TECHNIQUE_MAP[NOTE_TYPES[type].technique];
@@ -107,10 +107,7 @@ function NoteForm({ initial, type }) {
         <div className="grid-2">
           <label>
             Materia
-            <select value={subjectId} onChange={(e) => touch(setSubjectId)(e.target.value)}>
-              <option value="">Sin materia</option>
-              {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <SubjectSelect value={subjectId} onChange={touch(setSubjectId)} />
           </label>
           <label>
             Tema (opcional)

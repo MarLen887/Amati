@@ -1,0 +1,41 @@
+/* =====================================================================
+   Menú de hamburguesa (celular y tableta) — sustituye a la barra inferior
+   ===================================================================== */
+.bottom-nav { display: none !important; }
+.mobile-actions { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
+.home-link, .menu-toggle {
+  position: relative; display: inline-grid; place-items: center;
+  width: 2.75rem; height: 2.75rem; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--navy); cursor: pointer;
+}
+.home-link { text-decoration: none; }
+.home-link:hover, .menu-toggle:hover { background: var(--cream); }
+.home-link.active { background: var(--teal-soft); border-color: transparent; }
+.home-link .badge.dot { position: absolute; top: 0.35rem; right: 0.35rem; left: auto; width: 0.6rem; height: 0.6rem; padding: 0; }
+.menu-backdrop { position: fixed; inset: 0; z-index: 70; background: rgba(15, 18, 32, 0.5); animation: menu-fade 0.18s ease-out; }
+.mobile-menu {
+  position: absolute; top: 0; right: 0; bottom: 0; width: min(20rem, 86vw);
+  display: flex; flex-direction: column; gap: 0.2rem; padding: 0.75rem 0.75rem calc(1rem + env(safe-area-inset-bottom));
+  background: var(--surface); border-left: 1px solid var(--line); overflow-y: auto;
+  animation: menu-slide 0.22s ease-out;
+}
+.mobile-menu-head { display: flex; align-items: center; justify-content: space-between; padding: 0.25rem 0.5rem 0.75rem; }
+.mobile-link {
+  display: flex; align-items: center; gap: 0.8rem; padding: 0.85rem 0.9rem; border-radius: 12px;
+  text-decoration: none; color: var(--text); font-weight: 550; font-size: 1.02rem;
+}
+.mobile-link:hover { background: var(--cream); }
+.mobile-link.active { color: var(--navy); background: var(--teal-soft); }
+.mobile-link .badge { margin-left: auto; }
+@keyframes menu-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes menu-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .menu-backdrop, .mobile-menu { animation: none; } }
+
+/* Sin barra inferior: se recupera ese espacio */
+.content { padding-bottom: 3rem; }
+.sticky-actions { bottom: 1rem; }
+.pomo-pill { bottom: calc(1rem + env(safe-area-inset-bottom)); }
+
+@media (min-width: 1040px) {
+  .mobile-actions, .menu-backdrop { display: none; }
+}

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, ImageIcon, NotebookPen, PenLine, Search, Upload, Users } from 'lucide-react';
+import { FileText, ImageIcon, NotebookPen, PenLine, Plus, Search, Upload, Users } from 'lucide-react';
 import { useAuth } from '../../core/context/AuthContext.jsx';
 import { useData } from '../../core/context/DataContext.jsx';
 import { watchSharedNotes } from '../../core/data/db.js';
+import { AddSubjectButton } from '../subjects/SubjectSelect.jsx';
 import EmptyState from '../../core/components/EmptyState.jsx';
 import { fmtShort } from '../../core/lib/dates.js';
 import { NOTE_TYPES, TECHNIQUE_MAP } from '../techniques/techniques.js';
@@ -64,6 +65,7 @@ export default function Apuntes() {
         <span className="row gap wrap">
           <Link to="/apuntes/nuevo?tipo=libre" className="btn primary"><PenLine size={16} aria-hidden="true" /> Nuevo apunte</Link>
           <Link to="/clases/nueva" className="btn ghost"><Upload size={16} aria-hidden="true" /> Subir apuntes</Link>
+          <AddSubjectButton><Plus size={16} aria-hidden="true" /> Agregar materia</AddSubjectButton>
         </span>
       </header>
 

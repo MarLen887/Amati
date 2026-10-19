@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Users, X } from 'lucide-react';
 import { ALLOWED_DOMAIN, isAllowedEmail } from '../../../core/firebase.js';
 import { setCollaborators } from '../../../core/data/db.js';
@@ -8,12 +8,18 @@ import { emailJsReady, sendShareEmail } from '../../../core/lib/emailjs.js';
 const MAX = 30;
 
 // Compartir con compañeros o profesores: pueden abrir el apunte desde «Compartidos conmigo» y editarlo a la vez.
-export default function SharePanel({ ownerUid, noteId, emails, title = '' }) {
+export default function SharePanel({ ownerUid, noteId, emails, title = '', onClose }) {
   const { user, profile } = useAuth();
   const [info, setInfo] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onClose?.();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   async function save(next) {
     setBusy(true); setError('');
@@ -39,8 +45,9 @@ export default function SharePanel({ ownerUid, noteId, emails, title = '' }) {
           link: `${window.location.origin}/apuntes/compartido/${ownerUid}/${noteId}`,
         });
         setInfo(`Le avisamos por correo a ${v}.`);
-      } catch {
-        setInfo(`Invitaste a ${v}, pero no se pudo enviar el aviso por correo. Podrá verlo en «Compartidos conmigo».`);
+      } catch (err) {
+        console.error("EmailJS:", err.message);
+        setInfo(`Invitaste a ${v}, pero no se pudo enviar el aviso por correo (${err.message}). Podrá verlo en «Compartidos conmigo».`);
       }
     } else {
       setInfo(`Invitaste a ${v}. Lo verá en «Compartidos conmigo».`);
@@ -48,8 +55,13 @@ export default function SharePanel({ ownerUid, noteId, emails, title = '' }) {
   }
 
   return (
-    <section className="panel stack" aria-label="Compartir apunte">
-      <h2 className="row gap"><Users size={18} aria-hidden="true" /> Compartir y editar juntos</h2>
+    <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="share-title"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}>
+    <section className="panel stack modal-card">
+      <div className="row between">
+        <h2 id="share-title" className="row gap"><Users size={18} aria-hidden="true" /> Compartir y editar juntos</h2>
+        <button type="button" className="icon-btn" aria-label="Cerrar" onClick={onClose}><X size={16} /></button>
+      </div>
       <p className="small muted">Las personas que agregues podrán ver y editar este apunte en tiempo real. Quitarlas les retira el acceso.</p>
       <form className="row gap wrap" onSubmit={add}>
         <input type="email" className="grow" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={`correo@${ALLOWED_DOMAIN}`} aria-label="Correo de la persona" required />
@@ -68,5 +80,6 @@ export default function SharePanel({ ownerUid, noteId, emails, title = '' }) {
         </ul>
       )}
     </section>
+    </div>
   );
 }

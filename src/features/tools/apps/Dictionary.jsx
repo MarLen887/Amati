@@ -12,6 +12,19 @@ const WK = import.meta.env.VITE_WORDNIK_API_KEY || '';
 const EXAMPLES = ['implement', 'ubiquitous', 'resilient', 'scope', 'leverage', 'ambiguous'];
 const POS = { noun: 'sustantivo', verb: 'verbo', adjective: 'adjetivo', adverb: 'adverbio', pronoun: 'pronombre', preposition: 'preposición', conjunction: 'conjunción', interjection: 'interjección', exclamation: 'exclamación' };
 
+// El servicio gratuito del diccionario a veces tarda o no responde: se espera poco y se reintenta una vez
+async function fetchDict(word) {
+  let lastErr;
+  for (let i = 0; i < 2; i++) {
+    try {
+      return await fetch(`${DICT}/${encodeURIComponent(word)}`, { signal: AbortSignal.timeout(8000) });
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw new Error(lastErr?.name === 'TimeoutError' ? 'El diccionario tardó demasiado en responder. Inténtalo de nuevo en un momento.' : 'No se pudo conectar con el diccionario. Revisa tu conexión.');
+}
+
 async function wk(word, path, params = {}) {
   const qs = new URLSearchParams({ api_key: WK, ...params });
   const res = await fetch(`${WORDNIK}/${encodeURIComponent(word)}/${path}?${qs}`);
@@ -50,7 +63,7 @@ export default function Dictionary() {
     if (!w) return;
     setQ(w); setWord(w); setBusy(true); setError(''); setEntries(null); setAdv(null); setAdvErr(''); setTr({});
     try {
-      const res = await fetch(`${DICT}/${encodeURIComponent(w)}`).catch(() => { throw new Error('No se pudo conectar con el diccionario. Revisa tu conexión.'); });
+      const res = await fetchDict(w);
       if (res.status === 404) throw new Error(`No encontré «${w}». Revisa la ortografía (este diccionario es de inglés) o prueba con la forma base de la palabra.`);
       if (!res.ok) throw new Error(`El diccionario respondió ${res.status}.`);
       setEntries(await res.json());

@@ -3,7 +3,7 @@
 const env = import.meta.env;
 const cfg = {
   serviceId: env.VITE_EMAILJS_SERVICE_ID || '',
-  templateId: env.VITE_EMAILJS_TEMPLATE_SHARE || '',
+  templateId: env.VITE_EMAILJS_TEMPLATE_ID || env.VITE_EMAILJS_TEMPLATE_SHARE || '',
   publicKey: env.VITE_EMAILJS_PUBLIC_KEY || '',
 };
 
@@ -23,6 +23,6 @@ export async function sendShareEmail({ to, fromName, noteTitle, link }) {
       template_params: { to_email: to, from_name: fromName, note_title: noteTitle, link },
     }),
   });
-  if (!res.ok) throw new Error(`EmailJS respondió ${res.status}.`);
+  if (!res.ok) throw new Error(`EmailJS respondió ${res.status}: ${(await res.text()).slice(0, 200)}`);
   return true;
 }
