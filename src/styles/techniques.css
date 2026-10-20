@@ -243,3 +243,16 @@ kbd {
 .trivia-list label.checkbox { align-items: flex-start; }
 .trivia-history { list-style: none; padding: 0; margin: 0.25rem 0 0; display: flex; flex-direction: column; gap: 0.3rem; border-top: 1px dashed var(--line); padding-top: 0.6rem; }
 .trivia-history li { display: flex; justify-content: space-between; gap: 1rem; }
+
+/* Descripción emergente de las técnicas de apuntes */
+.tip-host { position: relative; }
+.tip {
+  display: none; position: absolute; z-index: 40; left: 0; bottom: calc(100% + 8px);
+  width: max-content; max-width: min(18rem, 80vw); padding: 0.6rem 0.75rem; border-radius: 10px;
+  background: var(--navy); color: var(--on-accent, #fff); font-size: 0.8rem; font-weight: 400; line-height: 1.4;
+  text-align: left; white-space: normal; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); pointer-events: none;
+}
+.tip strong { display: block; margin-bottom: 0.15rem; font-size: 0.82rem; }
+.tip-host:hover .tip, .tip-host:focus-visible .tip { display: block; }
+.chips > .tip-host:nth-last-child(-n + 2) .tip { left: auto; right: 0; }
+@media (max-width: 520px) { .chips > .tip-host:nth-child(even) .tip { left: auto; right: 0; } .chips > .tip-host:nth-child(odd) .tip { left: 0; right: auto; } }

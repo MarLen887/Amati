@@ -4,7 +4,6 @@ import { FileText, ImageIcon, Search } from 'lucide-react';
 import { useData } from '../../core/context/DataContext.jsx';
 import { fmtShort } from '../../core/lib/dates.js';
 
-const PROVIDER = { drive: 'Drive', cloudinary: 'Cloudinary' };
 
 // Lista de notas de clase; con subjectId muestra solo las de esa materia.
 export function ClassNotesList({ subjectId = '', showFilters = true }) {
@@ -58,7 +57,7 @@ export function ClassNotesList({ subjectId = '', showFilters = true }) {
                     </span>
                     <p className="small snippet">{n.text ? n.text.slice(0, 110) : 'Sin texto extraído todavía'}</p>
                     <span className="row gap wrap">
-                      {n.file && <span className="tag">{PROVIDER[n.file.provider]} · {n.file.kind === 'pdf' ? 'PDF' : 'Foto'}</span>}
+                      {n.file && <span className="tag">{n.file.kind === 'pdf' ? 'PDF' : 'Foto'}</span>}
                       {n.ocr === 'gemini' && <span className="tag pick-tag">Texto con IA</span>}
                     </span>
                   </div>

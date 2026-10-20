@@ -26,7 +26,7 @@ export function NewSubjectModal({ onCreated, onClose }) {
         </div>
         <p className="small muted">Solo necesitas el nombre; el color y la fecha de examen son opcionales.</p>
         <SubjectEditor
-          submitLabel="Crear materia"
+          submitLabel="Guardar"
           onCancel={onClose}
           onSave={async (d) => {
             const ref = await createSubject(user.uid, d);

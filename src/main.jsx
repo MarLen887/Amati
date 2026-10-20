@@ -11,6 +11,7 @@ import './styles/techniques.css';
 import './styles/classnotes.css';
 import './styles/redesign.css';
 import './styles/mobile-nav.css';
+import './styles/buttons.css';
 import { installRipple } from './core/lib/ripple.js';
 
 installRipple();

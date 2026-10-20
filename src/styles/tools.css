@@ -44,7 +44,7 @@ details:not([open]) > .tool-section-head { margin-bottom: 0; }
 .tool-row-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .tool-row-text .small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tool-row .fav-btn { position: static; margin-right: 0.4rem; }
-@media (max-width: 640px) { .tool-cat { display: none; } .view-switch button span { display: none; } }
+@media (max-width: 640px) { .tool-cat { display: none; } }
 .tools-filters label.row { flex-direction: row; align-items: center; }
 @media (max-width: 640px) { .tool-row .area-dots { display: none; } .tools-filters label.row { white-space: nowrap; } }
 
@@ -169,3 +169,41 @@ details:not([open]) > .tool-section-head { margin-bottom: 0; }
 .timeline-event { display: grid; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
 .timeline-date { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 0.4rem; }
 .timeline-inner { width: 100%; height: 100%; }
+
+/* ---------- Buscador de indicadores (INEGI) ---------- */
+.inegi-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.inegi-result { display: grid; gap: 0.15rem; width: 100%; text-align: left; padding: 0.7rem 0.9rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--text); cursor: pointer; font: inherit; }
+.inegi-result:hover:not(:disabled) { border-color: var(--navy); background: var(--cream); }
+.inegi-result:disabled { opacity: 0.6; cursor: default; }
+.inegi-result-title { font-weight: 600; }
+
+.inegi-top { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 640px) { .inegi-top { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 900px) { .inegi-top { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.inegi-card { display: grid; gap: 0.2rem; align-content: start; width: 100%; height: 100%; min-height: 5.5rem; text-align: left; padding: 0.7rem 0.75rem; border: 1px solid var(--line); border-top: 3px solid var(--navy); border-radius: 12px; background: var(--surface); color: var(--text); cursor: pointer; font: inherit; }
+.inegi-card:hover:not(:disabled) { background: var(--cream); border-color: var(--navy); }
+.inegi-card.active { background: var(--teal-soft); border-color: var(--navy); }
+.inegi-card:disabled { opacity: 0.6; cursor: default; }
+.inegi-card-icon { color: var(--navy); margin-bottom: 0.15rem; }
+.inegi-card-name { font-size: 0.92rem; line-height: 1.25; }
+
+/* ---------- Herramientas de una materia ---------- */
+.tools-picker { max-height: 90vh; }
+.tools-picker-list { display: grid; gap: 1rem; overflow-y: auto; max-height: 50vh; padding-right: 0.25rem; }
+.tools-picker-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.tool-check { align-items: flex-start; gap: 0.6rem; padding: 0.4rem 0.5rem; border-radius: 10px; }
+.tool-check:hover { background: var(--cream); }
+.tool-check-text { display: grid; gap: 0.1rem; }
+.block { display: block; }
+
+
+/* Barra de Herramientas: vistas siempre visibles y «Mi área» en una sola línea */
+.tools-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 0.9rem; }
+@media (max-width: 640px) {
+  .tools-bar .view-switch { width: 100%; }
+  .tools-bar .view-switch button { flex: 1 1 0; min-width: 0; justify-content: center; padding-inline: 0.4rem; font-size: 0.8rem; white-space: nowrap; }
+}
+
+.cards-section > summary { cursor: pointer; align-items: center; list-style: none; }
+.cards-section > summary::-webkit-details-marker { display: none; }
+.cards-section[open] > summary { margin-bottom: 0.9rem; }

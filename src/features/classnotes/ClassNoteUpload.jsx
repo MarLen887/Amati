@@ -7,7 +7,6 @@ import { saveClassNote } from '../../core/data/db.js';
 import { ACCEPT, has } from './api/integrations.js';
 import { preloadGoogleIdentity } from './api/drive.js';
 import { describeProvider, isImage, processUpload } from './api/pipeline.js';
-import ServiceStatus from './ServiceStatus.jsx';
 
 const toInput = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const fromInput = (v) => {
@@ -141,7 +140,7 @@ export default function ClassNoteUpload() {
 
         {route && (
           <p className="notice small">
-            Se guardará en <strong>{route}</strong>
+            {route}
             {ocr && has.gemini ? ' y Gemini extraerá el texto.' : '.'}
           </p>
         )}
@@ -188,11 +187,6 @@ export default function ClassNoteUpload() {
         </div>
       </form>
 
-      <details className="tips">
-        <summary>Servicios conectados</summary>
-        <ServiceStatus />
-        <p className="small muted">Las fotos van a Cloudinary (compresión), los PDF a tu Google Drive (carpeta «Amati») y Gemini lee ambos. Si falta uno, se usa el otro como respaldo.</p>
-      </details>
     </div>
   );
 }

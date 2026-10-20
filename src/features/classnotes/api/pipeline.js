@@ -38,9 +38,9 @@ export function chooseProvider(file) {
 export function describeProvider(file) {
   const p = chooseProvider(file);
   return {
-    drive: 'Google Drive (tu carpeta «Amati»)',
-    cloudinary: 'Cloudinary',
-    none: 'sin guardar el archivo (solo el texto)',
+    drive: 'Se guardará en Google Drive (tu carpeta «Amati»)',
+    cloudinary: 'Se guardará en la nube de Amati',
+    none: 'Se guardará solo el texto, sin el archivo',
   }[p];
 }
 
@@ -98,7 +98,7 @@ export async function fetchStoredBlob(file) {
   if (!res.ok) {
     throw new Error(
       file.kind === 'pdf' && (res.status === 401 || res.status === 403)
-        ? 'Cloudinary está bloqueando la entrega de PDFs. En tu cuenta de Cloudinary entra a Settings → Security, activa «PDF and ZIP files delivery», guarda y pulsa Reintentar.'
+        ? 'No se pudo abrir el PDF desde el almacenamiento de archivos. Pulsa Reintentar y, si sigue igual, avisa a quien administra el proyecto.'
         : 'No se pudo descargar el archivo. Revisa tu conexión e inténtalo de nuevo.',
     );
   }

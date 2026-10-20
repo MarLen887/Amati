@@ -5,61 +5,23 @@ import { useData } from '../../core/context/DataContext.jsx';
 import { createCard, deleteCard, updateCard } from '../../core/data/db.js';
 import { cardStatus, isDue } from '../techniques/cards/srs.js';
 import { fmtShort } from '../../core/lib/dates.js';
-import { CircleCheck, Compass, FileText, Lightbulb, Pencil, PenLine, Plus, Search, Sparkles, Trash2, Upload } from 'lucide-react';
+import { CircleCheck, Compass, FileText, Layers, Lightbulb, Pencil, PenLine, Plus, Search, Sparkles, Trash2, Upload } from 'lucide-react';
 import CardForm from './CardForm.jsx';
 import ImportCards from './ImportCards.jsx';
 import EmptyState from '../../core/components/EmptyState.jsx';
 import ExamCountdown from './ExamCountdown.jsx';
 import { DeleteSubjectModal, EditSubjectModal } from './SubjectModals.jsx';
+import SubjectTools from './SubjectTools.jsx';
+import SubjectRecentTechnique from './SubjectRecentTechnique.jsx';
 import { NotesList } from '../notes/Notes.jsx';
 import LibroList from '../library/LibroList.jsx';
 import MoreMenu from '../../core/components/MoreMenu.jsx';
 import UploadPdf from '../library/UploadPdf.jsx';
 import { ClassNotesList } from '../classnotes/ClassNotes.jsx';
-import { NOTE_TYPES, TECHNIQUE_MAP, techniqueUrl } from '../techniques/techniques.js';
-import TechniqueIcon from '../techniques/TechniqueIcon.jsx';
+import { NOTE_TYPES, techniqueUrl } from '../techniques/techniques.js';
+import TechniqueChip from '../techniques/TechniqueChip.jsx';
 
 const STATUS_LABEL = { new: 'Nueva', learning: 'Aprendiendo', mastered: 'Dominada' };
-
-// Pasos para dejar una materia lista (se muestra mientras no tenga contenido)
-function SetupGuide({ onAdd, onImport, subjectId, subjectName }) {
-  return (
-    <section className="panel stack setup-guide">
-      <div>
-        <p className="eyebrow">Tu materia está lista</p>
-        <h2>¿Cómo quieres agregar contenido?</h2>
-        <p className="muted">Elige una forma para empezar; después podrás combinarlas.</p>
-      </div>
-      <div className="option-grid">
-        <button type="button" className="option-tile" onClick={onAdd}>
-          <PenLine size={22} aria-hidden="true" />
-          <strong>Escribir tarjetas</strong>
-          <span className="small muted">Una pregunta y su respuesta a la vez. Lo más simple.</span>
-        </button>
-        <button type="button" className="option-tile" onClick={onImport}>
-          <Upload size={22} aria-hidden="true" />
-          <strong>Pegar o importar varias</strong>
-          <span className="small muted">Desde Excel, Google Sheets o un archivo CSV.</span>
-        </button>
-        <Link to={`/clases/nueva?materia=${subjectId}`} className="option-tile">
-          <Upload size={22} aria-hidden="true" />
-          <strong>Subir notas de clase</strong>
-          <span className="small muted">Foto de tu libreta o PDF; Amati extrae el texto.</span>
-        </Link>
-        <Link to={`/biblioteca?q=${encodeURIComponent(subjectName || '')}`} className="option-tile">
-          <Search size={22} aria-hidden="true" />
-          <strong>Buscar libros y trivia</strong>
-          <span className="small muted">Encuentra lecturas y preguntas sobre el tema.</span>
-        </Link>
-        <Link to={techniqueUrl('cornell', { subjectId })} className="option-tile">
-          <FileText size={22} aria-hidden="true" />
-          <strong>Tomar apuntes</strong>
-          <span className="small muted">Cornell, esquema, Feynman o lectura guiada.</span>
-        </Link>
-      </div>
-    </section>
-  );
-}
 
 function TipsCard() {
   return (
@@ -81,8 +43,11 @@ export default function SubjectDetail() {
   const [params] = useSearchParams();
   const { user } = useAuth();
   const { subjects, cards, notes, libros, classNotes, subjectMap, loading, now } = useData();
-  const [tab, setTab] = useState(params.get('tab') === 'apuntes' ? 'notes' : params.get('tab') === 'recursos' ? 'resources' : params.get('tab') === 'clases' ? 'class' : 'cards');
+  const [tab, setTab] = useState(
+    { recursos: 'resources', clases: 'class', herramientas: 'tools' }[params.get('tab')] || 'notes',
+  );
   const [adding, setAdding] = useState(params.get('agregar') === '1');
+  const [cardsOpen, setCardsOpen] = useState(params.get('agregar') === '1');
   const [editing, setEditing] = useState(null);
   const [modal, setModal] = useState(null); // 'edit' | 'delete'
   const [search, setSearch] = useState('');
@@ -114,15 +79,14 @@ export default function SubjectDetail() {
       (!q || (c.front || '').toLowerCase().includes(q) || (c.back || '').toLowerCase().includes(q)),
   );
   const due = subjectCards.filter((c) => isDue(c, now)).length;
-  const empty = subjectCards.length === 0 && subjectNotes.length === 0 && subjectLibros.length === 0 && subjectClassNotes.length === 0;
   const studyHref = `/tecnicas?materia=${id}${topicFilter ? `&tema=${encodeURIComponent(topicFilter)}` : ''}`;
 
   async function remove(c) {
     if (confirm('¿Eliminar esta tarjeta?')) await deleteCard(user.uid, c);
   }
 
-  const openAdd = () => { setAdding(true); setImporting(false); setTab('cards'); };
-  const openImport = () => { setImporting(true); setImported(0); setAdding(false); setTab('cards'); };
+  const openAdd = () => { setAdding(true); setImporting(false); setCardsOpen(true); };
+  const openImport = () => { setImporting(true); setImported(0); setAdding(false); setCardsOpen(true); };
 
   return (
     <div className="stack-lg">
@@ -157,25 +121,11 @@ export default function SubjectDetail() {
 
       {subject.examDate && <ExamCountdown subject={subject} cards={subjectCards} now={now} />}
 
-      {empty && !adding && !importing && <SetupGuide onAdd={openAdd} onImport={openImport} subjectId={id} subjectName={subject.name} />}
+      <SubjectRecentTechnique subjectId={id} cardCount={subjectCards.length} cardsOpen={cardsOpen} onToggleCards={() => setCardsOpen((o) => !o)} />
 
-      <div className="tabs" role="tablist" aria-label="Contenido de la materia">
-        <button role="tab" aria-selected={tab === 'cards'} className={tab === 'cards' ? 'active' : ''} onClick={() => setTab('cards')}>
-          Tarjetas <span className="tab-count">{subjectCards.length}</span>
-        </button>
-        <button role="tab" aria-selected={tab === 'notes'} className={tab === 'notes' ? 'active' : ''} onClick={() => setTab('notes')}>
-          Apuntes <span className="tab-count">{subjectNotes.length}</span>
-        </button>
-        <button role="tab" aria-selected={tab === 'class'} className={tab === 'class' ? 'active' : ''} onClick={() => setTab('class')}>
-          Clases <span className="tab-count">{subjectClassNotes.length}</span>
-        </button>
-        <button role="tab" aria-selected={tab === 'resources'} className={tab === 'resources' ? 'active' : ''} onClick={() => setTab('resources')}>
-          Biblioteca <span className="tab-count">{subjectLibros.length}</span>
-        </button>
-      </div>
-
-      {tab === 'cards' && (
-        <>
+      {cardsOpen && (
+      <section className="panel stack cards-section">
+        <h2 className="h3 row gap"><Layers size={18} aria-hidden="true" /> Mis tarjetas <span className="tab-count">{subjectCards.length}</span>{due > 0 && <span className="stat-pill pending">{due} pendientes</span>}</h2>
           {!adding && !importing && (
             <div className="row gap wrap">
               <button className="btn ghost" onClick={openAdd}><Plus size={16} aria-hidden="true" /> Nueva tarjeta</button>
@@ -231,7 +181,7 @@ export default function SubjectDetail() {
             </div>
           )}
 
-          {subjectCards.length === 0 && !empty && !adding && !importing && (
+          {subjectCards.length === 0 && !adding && !importing && (
             <section className="panel">
               <EmptyState
                 title="Aún no hay tarjetas"
@@ -288,8 +238,25 @@ export default function SubjectDetail() {
               ),
             )}
           </ul>
-        </>
+      </section>
       )}
+
+      <div className="tabs" role="tablist" aria-label="Contenido de la materia">
+        <button role="tab" aria-selected={tab === 'notes'} className={tab === 'notes' ? 'active' : ''} onClick={() => setTab('notes')}>
+          Apuntes <span className="tab-count">{subjectNotes.length}</span>
+        </button>
+        <button role="tab" aria-selected={tab === 'class'} className={tab === 'class' ? 'active' : ''} onClick={() => setTab('class')}>
+          Clases <span className="tab-count">{subjectClassNotes.length}</span>
+        </button>
+        <button role="tab" aria-selected={tab === 'tools'} className={tab === 'tools' ? 'active' : ''} onClick={() => setTab('tools')}>
+          Herramientas <span className="tab-count">{(subject.toolIds || []).length}</span>
+        </button>
+        <button role="tab" aria-selected={tab === 'resources'} className={tab === 'resources' ? 'active' : ''} onClick={() => setTab('resources')}>
+          Biblioteca <span className="tab-count">{subjectLibros.length}</span>
+        </button>
+      </div>
+
+      {tab === 'tools' && <SubjectTools subject={subject} />}
 
       {tab === 'class' && (
         <section className="stack">
@@ -317,16 +284,11 @@ export default function SubjectDetail() {
 
       {tab === 'notes' && (
         <section className="stack">
-          <p className="small muted">Crea un apunte nuevo con la técnica que prefieras:</p>
+          <p className="small muted">Crea un apunte nuevo. Pasa el puntero sobre una técnica para ver de qué trata:</p>
           <div className="chips">
-            {Object.entries(NOTE_TYPES).map(([k, v]) => {
-              const t = TECHNIQUE_MAP[v.technique];
-              return (
-                <Link key={k} to={techniqueUrl(v.technique, { subjectId: id })} className="chip note-chip" title={t.short}>
-                  <TechniqueIcon name={t.icon} size={14} /> {v.label}
-                </Link>
-              );
-            })}
+            {Object.entries(NOTE_TYPES).map(([k, v]) => (
+              <TechniqueChip key={k} noteType={k} primary={k === 'libre'} to={techniqueUrl(v.technique, { subjectId: id })} />
+            ))}
           </div>
           <NotesList subjectId={id} compact />
         </section>

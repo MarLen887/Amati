@@ -33,7 +33,7 @@ export default function Progress() {
         <p className="muted">Tu avance, a tu ritmo. Sin rankings ni comparaciones.</p>
       </header>
 
-      <ul className="metric-grid">
+      <ul className="metric-grid" data-tour="progress-metrics">
         <Metric Icon={Flame} tone="streak" value={stats.loaded ? `${days} ${days === 1 ? 'día' : 'días'}` : '…'} label="Racha" />
         <Metric Icon={ShieldCheck} tone="ok" value={mastered} label="Tarjetas dominadas" />
         <Metric Icon={Layers} tone="pending" value={pending} label="Pendientes hoy" />

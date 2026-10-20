@@ -23,6 +23,7 @@ Proyecto Integrador · Problemática Social Contemporánea · Equipo C · Grupo 
 12. [Funcionalidades](#12-funcionalidades)
 13. [Herramientas de estudio](#13-herramientas-de-estudio)
 14. [Estructura del proyecto y datos](#14-estructura-del-proyecto-y-datos)
+15. [Tutorial y Centro de ayuda](#15-tutorial-y-centro-de-ayuda)
 
 ---
 
@@ -118,6 +119,7 @@ usa un respaldo. Con solo Firebase la app ya funciona.
 | `VITE_CLOUDINARY_CLOUD_NAME`, `VITE_CLOUDINARY_UPLOAD_PRESET` | Subir imágenes y PDFs (tarjetas, notas de clase, PDFs propios) | Paso 11 |
 | `VITE_GEMINI_API_KEY`, `VITE_GEMINI_MODEL` | IA: leer texto de fotos/PDF, resumir, crear tarjetas y quizzes | Paso 11 |
 | `VITE_GOOGLE_CLIENT_ID` | Guardar PDFs en el Google Drive del alumno | Paso 11 |
+| `VITE_WELCOME_VIDEO` | Video de bienvenida del tutorial (enlace de YouTube «No listado») | [Paso 15](#15-tutorial-y-centro-de-ayuda) |
 | `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, `VITE_EMAILJS_PUBLIC_KEY` | Correo de aviso al compartir un apunte | [Paso 10](#10-correos-recordatorios-y-apuntes-compartidos-gratis) |
 | `VITE_DESMOS_API_KEY` | Graficadora ([llave gratis](https://www.desmos.com/api)); en desarrollo usa una de demostración | [Paso 13](#13-herramientas-de-estudio) |
 | `VITE_WORDNIK_API_KEY` | Diccionario avanzado ([llave gratis](https://developer.wordnik.com)) | Paso 13 |
@@ -127,6 +129,23 @@ usa un respaldo. Con solo Firebase la app ya funciona.
 
 > Estas llaves viajan en el navegador, así que **restríngelas a tu dominio** en la consola de cada servicio cuando lo permita.
 > Aun así, **no subas `.env.local` a GitHub** (ya está en `.gitignore`).
+
+### 4.1 Activar «Continuar con Google» en Firebase (una sola vez)
+
+Amati **no usa contraseñas**: se entra con la cuenta de Google institucional (`@uvp.edu.mx`). Quien administra el proyecto debe
+activarlo una vez en la [Consola de Firebase](https://console.firebase.google.com):
+
+1. **Authentication → Método de acceso** (*Sign-in method*) → **Google** → **Habilitar**. Elige un correo de asistencia del proyecto y guarda.
+2. **Authentication → Configuración → Dominios autorizados:** deben estar `localhost` y el dominio donde publiques Amati
+   (`amati-8382f.web.app` y `amati-8382f.firebaseapp.com` ya vienen). Si usas otro dominio, agrégalo aquí.
+3. *(Recomendado)* En el mismo *Método de acceso*, **deshabilita «Correo electrónico/contraseña»**, para que ya no exista esa vía.
+4. *(Si ya había cuentas)* En **Authentication → Configuración → Vinculación de cuentas de usuario**, deja activa
+   «Vincular cuentas que usan el mismo correo electrónico». Así quienes ya se habían registrado con contraseña entran con Google
+   y **conservan sus tarjetas y apuntes** (es la misma cuenta).
+
+Cómo funciona por dentro: al pulsar el botón se abre la ventana de Google; si la cuenta no es `@uvp.edu.mx`, Amati la rechaza y borra
+la cuenta recién creada. Las reglas de Firestore también exigen un correo `@uvp.edu.mx` verificado (Google ya lo verifica), así
+que **no hay que cambiar la base de datos**: los datos siguen guardados por usuario como antes.
 
 ---
 
@@ -147,25 +166,28 @@ Abre **http://localhost:5173** en el navegador. Para detener el servidor presion
 
 **Primer uso:**
 
-1. Entra a **Regístrate** con tu correo **@uvp.edu.mx** (otros dominios no se permiten).
-2. Abre el enlace de verificación que llega a tu correo (revisa *spam*; lo envía `noreply@amati-8382f.firebaseapp.com`).
-3. Vuelve a la app y presiona **"Ya verifiqué mi correo"**.
+1. Pulsa **«Continuar con Google»** y elige tu cuenta **@uvp.edu.mx** (otros dominios no se permiten).
+2. Listo: no hay contraseña ni correo de verificación. Si es tu primera vez, Amati crea tu perfil y te muestra una guía corta.
+
+> Si el botón marca un error de Firebase, falta activar Google (paso 4.1).
 
 > ⚠️ Es una app de React: **no** se abre con `http://localhost/Amati` de Apache/Laragon. Siempre usa `npm run dev`.
 
 **En celular y tableta** el menú es de hamburguesa (☰, arriba a la derecha) y junto a él hay un botón de casa para volver
 al Inicio. En computadora el menú está en la barra superior.
 
+**Modo de color:** en el **Inicio** (arriba a la derecha) hay tres íconos para elegir *claro*, *oscuro* o *predeterminado* (el del dispositivo); también están en la pantalla de acceso.
+
 ---
 
 ## 6. Cuenta de administrador (panel de investigación)
 
 **No existe una cuenta de administrador con usuario y contraseña propios.** El administrador es una cuenta
-normal de estudiante cuyo correo está autorizado. Así no hay contraseñas compartidas ni guardadas en el código.
+normal de estudiante (que entra con Google) cuyo correo está autorizado. Así no hay contraseñas compartidas ni guardadas en el código.
 
 Para dar acceso a un integrante del equipo:
 
-1. La persona se **registra y verifica** su correo @uvp.edu.mx en la app (paso 5).
+1. La persona entra una vez con **«Continuar con Google»** (paso 5) para que exista su cuenta.
 2. En la [Consola de Firebase](https://console.firebase.google.com) → **Firestore Database** → *Iniciar colección*:
    - ID de la colección: `admins`
    - ID del documento: el **correo en minúsculas**, por ejemplo `nombre.apellido@uvp.edu.mx`
@@ -199,9 +221,11 @@ Después de un `git pull`, si cambió `package.json`, vuelve a ejecutar `npm ins
 | `npm` / `node` / `git` **no se reconoce** | Instálalo (paso 1) y abre una terminal nueva. En Laragon usa su terminal. |
 | `firebase` **no se reconoce** | Instálalo con `npm install -g firebase-tools` y abre una terminal nueva. Con Laragon puede quedar en `C:\laragon\bin\nodejs\<versión>\firebase.cmd`. |
 | **"Port 5173 is in use"** | Ya hay otro `npm run dev` abierto. Ciérralo o usa `npm run dev -- --port 5174`. |
-| **"Solo se permiten correos @uvp.edu.mx"** | Es intencional: la app es para la comunidad UVP. También aplica al compartir apuntes. |
-| No llega el correo de verificación | Revisa *spam* y usa "Reenviar correo" en la pantalla de verificación. |
-| Errores de permisos (`permission-denied`) | Verifica tu correo y que las reglas estén publicadas (paso 9). |
+| **«Continuar con Google»** muestra *«no está activado…»* | Falta el paso 4.1: activar Google en *Authentication → Método de acceso*. |
+| Error de *«sitio no autorizado»* al entrar con Google | Agrega el dominio en *Authentication → Configuración → Dominios autorizados* (paso 4.1). |
+| La ventana de Google no se abre | Tu navegador la bloqueó: permite las ventanas emergentes para el sitio y vuelve a intentar. |
+| Dice *«Solo se permiten cuentas @uvp.edu.mx»* | Elegiste otra cuenta de Google. Usa la institucional (puedes cambiar de cuenta en la ventana de Google). |
+| Errores de permisos (`permission-denied`) | Entra con tu cuenta `@uvp.edu.mx` y verifica que las reglas estén publicadas (paso 9). |
 | «Compartidos conmigo» no muestra nada | Faltan publicar los índices: `firebase deploy --only firestore:indexes` (paso 9). |
 | No veo la pestaña **Investigación** | Tu correo no está en la colección `admins` (paso 6), o falta cerrar y abrir sesión. |
 | No llegan los **recordatorios de estudio** | Revisa el paso 10: los secretos de GitHub, que el archivo `.github/workflows/reminders.yml` esté subido y que hayas activado el recordatorio en *Perfil → Recordatorios*. Solo se envía si tienes tarjetas pendientes. |
@@ -323,7 +347,7 @@ firebase deploy --only functions             # pide SMTP_USER y MAIL_FROM; el re
 
 ## 11. Servicios opcionales y cómo configurarlos
 
-Todo corre en el navegador (sin servidor propio). La pantalla **Apuntes → Subir apuntes** muestra qué servicios están activos.
+Todo corre en el navegador (sin servidor propio). Si falta alguno, la app usa el otro como respaldo o simplemente oculta esa función.
 
 | Servicio | Para qué | Cómo configurarlo |
 |----------|----------|-------------------|
@@ -341,17 +365,19 @@ quedan sin enlace en Amati y deben limpiarse desde el panel de Cloudinary.
 
 ## 12. Funcionalidades
 
+**Inicio:** el botón principal es **«Continuar con» la última técnica que usaste** (o «Empezar sesión de estudio» si todavía no usas ninguna).
+
 **Navegación:** Inicio · Estudiar (técnicas y metas) · **Mis materias** · Biblioteca · Apuntes · Herramientas · Progreso ·
 Perfil. En celular, el menú se abre con ☰ y «Inicio» queda siempre a la vista.
 
 | Módulo | Qué incluye | Carpeta |
 |--------|-------------|---------|
-| Autenticación | Solo `@uvp.edu.mx`, verificación de correo, recuperación y cambio de contraseña, aviso de privacidad | `src/features/auth/`, `src/core/context/AuthContext.jsx` |
-| **Materias** | Crear, **editar (nombre y color)** y **eliminar** materias en ventanas modales; el selector de materia de los apuntes permite «＋ Agregar materia…». Al eliminar se avisa qué se pierde y se pide confirmar | `src/features/subjects/` |
-| Tarjetas | Materias > temas, imágenes, importación en bloque (Excel/CSV), materia de ejemplo | `src/features/subjects/` |
+| Autenticación | **«Continuar con Google»** con cuenta `@uvp.edu.mx` (sin contraseñas), aviso de privacidad, descargar o borrar la cuenta (se confirma con Google) | `src/features/auth/`, `src/core/context/AuthContext.jsx` |
+| **Materias** | Crear, **editar (nombre y color)** y **eliminar** materias en ventanas modales (**no se permiten dos materias con el mismo nombre**, sin importar mayúsculas ni acentos); el selector de materia de los apuntes permite «＋ Agregar materia…». Al eliminar se avisa qué se pierde y se pide confirmar | `src/features/subjects/` |
+| Página de cada materia | Arriba, la **técnica de estudio que usaste más recientemente en esa materia** (con «Continuar» y «Usar otra técnica»; el enlace «Administrar mis tarjetas» abre sus tarjetas para crear, importar, buscar y editar) y las pestañas **Apuntes**, **Clases**, **Herramientas** (las que el alumno agrega a la materia) y **Biblioteca**. Temas, imágenes, importación en bloque (Excel/CSV) y materia de ejemplo | `src/features/subjects/` |
 | Repetición espaciada | SM-2 simplificado (Difícil / Bien / Fácil) con **fecha de examen** por materia | `src/features/techniques/cards/srs.js` |
 | **Técnicas de estudio** | Repetición espaciada, **Leitner**, **FSRS**, **recuperación** (con calibración de confianza), **intercalada**, **interrogación elaborativa** y **Pomodoro suave** | `src/features/techniques/`, `src/features/pomodoro/` |
-| **Apuntes** | **Cornell** (con autoexamen y conversión a tarjetas), **esquema**, **Feynman**, **PQ4R**, **SQ3R** y **apuntes libres** (editor con fórmulas, dibujo y edición en tiempo real) que se pueden **compartir** con cuentas @uvp.edu.mx | `src/features/notes/` |
+| **Apuntes** | **Apunte libre** (siempre primero) y técnicas guiadas, cada una con una explicación sencilla al pasar el puntero: **Cornell** (con autoexamen y conversión a tarjetas), **esquema**, **Feynman**, **PQ4R**, **SQ3R** y **apuntes libres** (editor con fórmulas, dibujo y edición en tiempo real) que se pueden **compartir** con cuentas @uvp.edu.mx | `src/features/notes/` |
 | **Generar recursos con IA** | Desde un apunte, nota de clase o PDF: **resumen**, **tarjetas** (se revisan antes de guardar) y **quiz** de opción múltiple. Requiere Gemini | `src/features/notes/GenerateResources.jsx`, `QuizPanel.jsx` |
 | **Biblioteca** | Buscador de libros (**Open Library + Gutenberg + Google Books**) limitado a textos **académicos, científicos, educativos y literarios**, con descripción de dos oraciones, filtro de idiomas (es/en/fr/de) y «solo descargables». También artículos (Crossref), temas (Wikipedia), trivia (OpenTDB) y «Mis libros» con PDFs propios | `src/features/library/`, `src/features/search/` |
 | **Notas de clase** | Fotos de libreta y PDFs (Cloudinary), transcripción con Gemini, texto editable, resumen, tarjetas y lector de PDF con anotaciones | `src/features/classnotes/`, `src/features/pdf/` |
@@ -385,7 +411,7 @@ Tesseract.js descarga su motor y los idiomas desde una CDN la primera vez que se
 
 ## 13. Herramientas de estudio
 
-Vista **Herramientas**, organizada por las **áreas de la UVP** (Ciencias de la Salud, Artes y Humanidades, Ciencias de la vida, Ingenierías, y Negocios, Hospitalidad y Ciencias Sociales), por necesidad o en lista.
+Vista **Herramientas**: el bloque **«¿De qué área es tu carrera?»** siempre está a la vista (elige un área o **Ver todas**, y puedes cambiarlo cuando quieras), seguido de un buscador, las tres formas de verlas (**Por área**, **Por necesidad** y **Lista**) y el filtro «Solo favoritas». Por defecto se organizan por las **áreas de la UVP** (Ciencias de la Salud, Artes y Humanidades, Ciencias de la vida, Ingenierías, y Negocios, Hospitalidad y Ciencias Sociales).
 
 Las herramientas útiles para todas las carreras aparecen en «Para todas las carreras». El catálogo está en
 `src/features/tools/tools.js` (`R(...)` = herramienta funcional; `T(...)` marca una futura como «Próximamente»); cada
@@ -412,7 +438,7 @@ herramienta vive en `src/features/tools/apps/` y se registra en `ToolHost.jsx`. 
 | Excel: fórmulas y archivos | SheetJS + Formula.js | no |
 | Gráficas y dashboards | Apache ECharts | no |
 | Comparador de países | Banco Mundial + ECharts | no |
-| Indicadores de México | INEGI (BIE) | `VITE_INEGI_TOKEN` (gratis). Trae listos el INPC (clave `628194`) y la desocupación (`444884`); cualquier otra clave del INEGI se consulta en «Otra clave» |
+| Indicadores de México | INEGI: tarjetas con los **10 indicadores más consultados** y **búsqueda por nombre** (PIB, inflación, personas ciegas…), con gráfica e historial | `VITE_INEGI_TOKEN` (gratis) |
 
 ### Programación
 
@@ -468,7 +494,7 @@ Amati/
 │   │   ├── progress/        Progreso
 │   │   ├── settings/        Perfil, recordatorios y mis datos
 │   │   ├── admin/           Panel de investigación
-│   │   └── auth/            Registro, inicio de sesión
+│   │   └── auth/            Acceso con Google
 │   └── styles/              Estilos y animaciones
 ├── functions/               Cloud Function de recordatorios (alternativa, requiere plan Blaze)
 ├── firestore.rules          Reglas de seguridad de la base de datos
@@ -496,3 +522,23 @@ research_sessions/{id}       copia anónima (anonId) de cada sesión
 research_reviews/{id}        copia anónima (anonId) de cada repaso
 admins/{correo}              administradores del panel de investigación
 ```
+
+---
+
+## 15. Tutorial y Centro de ayuda
+
+**Primera vez:** al entrar por primera vez aparece el **video de bienvenida** (con «Omitir» desde el inicio) y, al terminar o al omitirlo, un **recorrido con globos** que señala la pantalla real, con **2 globos por vista** (Inicio, Materias, Biblioteca, Apuntes, Herramientas y Progreso) y los botones «Siguiente», «Atrás» y «Omitir», sin contador de pasos. Al final ofrece crear la primera materia o probar con una de ejemplo. Se recuerda que ya lo viste (en el navegador y en tu perfil, campo `tutorialSeen`), así que no se repite.
+
+**Centro de ayuda (Perfil):** botones para **ver el video otra vez** y **repetir el recorrido**, y **preguntas frecuentes** desplegables con búsqueda.
+
+**Cómo agregar el video:** el guion y la guía de producción están en [`docs/guion-video-bienvenida.md`](docs/guion-video-bienvenida.md). Sube el video a YouTube como «No listado» y pon el enlace en `VITE_WELCOME_VIDEO` (paso 4). Mientras esa variable esté vacía, el tutorial funciona solo con el recorrido.
+
+**Cómo editar el contenido:**
+
+| Qué | Dónde |
+|-----|-------|
+| Pasos del recorrido (textos, orden, pantalla) | `src/features/tutorial/tutorialSteps.js` |
+| Qué parte de la pantalla señala cada paso | atributos `data-tour="…"` en los componentes de cada vista |
+| Preguntas frecuentes | `src/features/tutorial/faq.js` |
+
+Si cambias o mueves un botón señalado por el recorrido, conserva su atributo `data-tour`; si un objetivo no existe en pantalla, el paso se muestra al centro y el recorrido sigue funcionando.

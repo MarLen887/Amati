@@ -113,6 +113,22 @@ export function updateSubject(uid, id, { name, color, examDate = null }) {
   return updateDoc(doc(db, 'users', uid, 'subjects', id), { name: name.trim(), color, examDate: tsOrNull(examDate) });
 }
 
+// Herramientas que el alumno agregó a una materia (ids del catálogo de Herramientas)
+export function setSubjectTools(uid, id, toolIds) {
+  return updateDoc(doc(db, 'users', uid, 'subjects', id), { toolIds: [...new Set(toolIds)].slice(0, 40) });
+}
+
+// Última sesión de estudio de una materia: { technique, at } (null si aún no hay)
+export async function fetchLastSubjectSession(uid, subjectId) {
+  const snap = await getDocs(query(sub(uid, 'sessions'), where('subjectId', '==', subjectId)));
+  let best = null;
+  snap.docs.forEach((d) => {
+    const x = withDates(d);
+    if (x.technique && x.startedAt && (!best || x.startedAt > best.at)) best = { technique: x.technique, at: x.startedAt };
+  });
+  return best;
+}
+
 export async function deleteSubject(uid, id) {
   const cards = await getDocs(query(sub(uid, 'cards'), where('subjectId', '==', id)));
   // Imágenes de las tarjetas (mejor esfuerzo)

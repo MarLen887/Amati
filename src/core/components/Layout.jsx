@@ -6,6 +6,7 @@ import Logo from './Logo.jsx';
 import { BookMarked, ChartLine, GraduationCap, House, Library, Menu, NotebookPen, User, Wrench, X } from 'lucide-react';
 import Ambient from './Ambient.jsx';
 import PomodoroPill from '../../features/pomodoro/PomodoroPill.jsx';
+import { TutorialProvider } from '../../features/tutorial/TutorialContext.jsx';
 
 // Navegación centrada en lo que el estudiante quiere hacer.
 // `match`: rutas que mantienen activa la pestaña (p. ej. una sesión de estudio sigue siendo «Estudiar»).
@@ -48,13 +49,14 @@ export default function Layout() {
   }, [due, inApp]);
 
   return (
+    <TutorialProvider>
     <div className="app-shell">
       <Ambient />
       <header className="topbar">
         <Link to="/" className="brand" aria-label="Amati, ir al inicio">
           <Logo size={34} withText />
         </Link>
-        <nav className="top-nav" aria-label="Principal">
+        <nav className="top-nav" aria-label="Principal" data-tour="nav">
           {NAV.map((n) => (
             <Link key={n.to} to={n.to} className={`nav-link ${isActive(n, pathname) ? 'active' : ''}`}
               aria-current={isActive(n, pathname) ? 'page' : undefined}>
@@ -69,7 +71,7 @@ export default function Layout() {
           <House size={22} aria-hidden="true" />
           {inApp && due > 0 && <span className="badge dot" aria-hidden="true" />}
         </Link>
-        <button type="button" className="menu-toggle" aria-label="Abrir menú" aria-expanded={menuOpen} aria-controls="mobile-menu"
+        <button type="button" className="menu-toggle" data-tour="nav" aria-label="Abrir menú" aria-expanded={menuOpen} aria-controls="mobile-menu"
           onClick={() => setMenuOpen(true)}>
           <Menu size={24} aria-hidden="true" />
         </button>
@@ -101,5 +103,6 @@ export default function Layout() {
         </div>
       )}
     </div>
+    </TutorialProvider>
   );
 }

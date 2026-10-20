@@ -7,7 +7,8 @@ import { watchSharedNotes } from '../../core/data/db.js';
 import { AddSubjectButton } from '../subjects/SubjectSelect.jsx';
 import EmptyState from '../../core/components/EmptyState.jsx';
 import { fmtShort } from '../../core/lib/dates.js';
-import { NOTE_TYPES, TECHNIQUE_MAP } from '../techniques/techniques.js';
+import { NOTE_TYPES, TECHNIQUE_MAP, techniqueUrl } from '../techniques/techniques.js';
+import TechniqueChip from '../techniques/TechniqueChip.jsx';
 
 const FILTERS = [
   ['all', 'Todos'],
@@ -64,10 +65,19 @@ export default function Apuntes() {
         <h1>Tus apuntes</h1>
         <span className="row gap wrap">
           <Link to="/apuntes/nuevo?tipo=libre" className="btn primary"><PenLine size={16} aria-hidden="true" /> Nuevo apunte</Link>
-          <Link to="/clases/nueva" className="btn ghost"><Upload size={16} aria-hidden="true" /> Subir apuntes</Link>
+          <Link to="/clases/nueva" className="btn ghost" data-tour="notes-upload"><Upload size={16} aria-hidden="true" /> Subir apuntes</Link>
           <AddSubjectButton><Plus size={16} aria-hidden="true" /> Agregar materia</AddSubjectButton>
         </span>
       </header>
+
+      <section className="stack-sm" aria-label="Crear un apunte" data-tour="notes-create">
+        <p className="small muted">Crear un apunte. Pasa el puntero sobre una técnica para ver de qué trata:</p>
+        <div className="chips">
+          {Object.entries(NOTE_TYPES).map(([k, v]) => (
+            <TechniqueChip key={k} noteType={k} primary={k === 'libre'} to={techniqueUrl(v.technique)} />
+          ))}
+        </div>
+      </section>
 
       {total === 0 ? (
         <section className="panel">

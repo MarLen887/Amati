@@ -49,7 +49,7 @@ export default function UploadPdf({ subjectId = '', onDone, onCancel }) {
   }
 
   if (!cloudinaryConfigured) {
-    return <p className="notice warn small">Para subir PDFs falta configurar Cloudinary (VITE_CLOUDINARY_CLOUD_NAME y VITE_CLOUDINARY_UPLOAD_PRESET).</p>;
+    return <p className="notice warn small">La subida de PDFs no está disponible por el momento.</p>;
   }
 
   return (

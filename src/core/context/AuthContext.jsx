@@ -1,52 +1,68 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import {
-  createUserWithEmailAndPassword,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  updatePassword,
   deleteUser,
+  GoogleAuthProvider,
   onIdTokenChanged,
-  sendEmailVerification,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
+  reauthenticateWithPopup,
+  signInWithPopup,
+  signInWithRedirect,
   signOut,
-  updateProfile as updateAuthProfile,
 } from 'firebase/auth';
 import { auth, isAllowedEmail, ALLOWED_DOMAIN } from '../firebase.js';
-import { checkIsAdmin, deleteUserData, ensureUserProfile, updateProfile, watchProfile } from '../data/db.js';
+import { checkIsAdmin, deleteUserData, ensureUserProfile, watchProfile } from '../data/db.js';
 import { deleteAllUserImages } from '../lib/images.js';
 
 const AuthContext = createContext(null);
 
+// Inicio de sesión únicamente con Google (cuenta institucional): no hay contraseñas en Amati.
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ hd: ALLOWED_DOMAIN, prompt: 'select_account' }); // sugiere la cuenta institucional
+
 const ERRORS = {
-  'auth/invalid-credential': 'Correo o contraseña incorrectos.',
-  'auth/wrong-password': 'Correo o contraseña incorrectos.',
-  'auth/user-not-found': 'No existe una cuenta con ese correo.',
-  'auth/email-already-in-use': 'Ya existe una cuenta con ese correo.',
-  'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
-  'auth/invalid-email': 'El correo no es válido.',
+  'auth/popup-closed-by-user': '',
+  'auth/cancelled-popup-request': '',
+  'auth/user-cancelled': '',
+  'auth/account-exists-with-different-credential': 'Ya existe una cuenta con ese correo. Inicia sesión con Google usando el correo institucional.',
+  'auth/unauthorized-domain': 'Este sitio no está autorizado en Firebase (Authentication → Configuración → Dominios autorizados).',
+  'auth/operation-not-allowed': 'El inicio de sesión con Google no está activado en Firebase (Authentication → Método de acceso → Google).',
   'auth/too-many-requests': 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.',
   'auth/network-request-failed': 'Sin conexión. Revisa tu internet.',
-  'auth/requires-recent-login': 'Por seguridad, cierra sesión y vuelve a entrar antes de cambiar la contraseña.',
-  'auth/missing-password': 'Escribe tu contraseña actual.',
+  'auth/requires-recent-login': 'Por seguridad, cierra sesión y vuelve a entrar con Google antes de continuar.',
+  'auth/popup-blocked': 'Tu navegador bloqueó la ventana de Google. Permite las ventanas emergentes e inténtalo de nuevo.',
 };
 
+// '' = no mostrar mensaje (p. ej. la persona cerró la ventana de Google)
 export function authErrorMessage(err) {
-  return ERRORS[err?.code] || err?.message || 'Ocurrió un error inesperado.';
+  if (err?.code && err.code in ERRORS) return ERRORS[err.code];
+  return err?.message || 'Ocurrió un error inesperado.';
 }
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined); // undefined = cargando
   const [profile, setProfile] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [authNotice, setAuthNotice] = useState('');
 
-  useEffect(() => onIdTokenChanged(auth, (u) => setUser(u || null)), []);
+  useEffect(
+    () => onIdTokenChanged(auth, async (u) => {
+      // Solo cuentas institucionales: si entra otra, se elimina la cuenta recién creada y se cierra la sesión
+      if (u && !isAllowedEmail(u.email)) {
+        setAuthNotice(`Solo se permiten cuentas @${ALLOWED_DOMAIN}. Elige tu cuenta institucional.`);
+        try { await deleteUser(u); } catch { /* si no se puede borrar, al menos se cierra la sesión */ }
+        await signOut(auth).catch(() => {});
+        setUser(null);
+        return;
+      }
+      setUser(u || null);
+    }),
+    [],
+  );
 
   useEffect(() => {
     if (!user) {
       setProfile(null);
       setIsAdmin(false);
-      return;
+      return undefined;
     }
     let unsub = () => {};
     let cancelled = false;
@@ -55,58 +71,42 @@ export function AuthProvider({ children }) {
         if (!cancelled) unsub = watchProfile(user.uid, setProfile);
       })
       .catch((e) => console.error('Perfil:', e));
-    if (user.emailVerified) {
-      setIsAdmin(null); // null = verificando
-      checkIsAdmin(user.email).then(setIsAdmin);
-    } else setIsAdmin(false);
+    setIsAdmin(null); // null = verificando
+    checkIsAdmin(user.email).then(setIsAdmin);
     return () => {
       cancelled = true;
       unsub();
     };
-  }, [user?.uid, user?.emailVerified]);
+  }, [user?.uid]);
 
   const value = {
     user,
     profile,
     isAdmin,
     loading: user === undefined,
-    async register({ name, email, password }) {
-      if (!isAllowedEmail(email)) throw new Error(`Solo se permiten correos @${ALLOWED_DOMAIN}.`);
-      const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      await ensureUserProfile(cred.user, { displayName: name?.trim() });
-      if (name) {
-        await updateAuthProfile(cred.user, { displayName: name.trim() });
-        await updateProfile(cred.user.uid, { displayName: name.trim() });
+    authNotice,
+    clearAuthNotice: () => setAuthNotice(''),
+    // «Continuar con Google». Si el navegador bloquea la ventana, se usa la redirección.
+    async loginWithGoogle() {
+      setAuthNotice('');
+      try {
+        await signInWithPopup(auth, googleProvider);
+      } catch (err) {
+        if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/operation-not-supported-in-this-environment') {
+          await signInWithRedirect(auth, googleProvider);
+          return;
+        }
+        throw err;
       }
-      await sendEmailVerification(cred.user);
-      return cred.user;
-    },
-    async login({ email, password }) {
-      if (!isAllowedEmail(email)) throw new Error(`Solo se permiten correos @${ALLOWED_DOMAIN}.`);
-      return signInWithEmailAndPassword(auth, email.trim(), password);
     },
     logout: () => signOut(auth),
-    resetPassword: (email) => sendPasswordResetEmail(auth, email.trim()),
-    resendVerification: () => sendEmailVerification(auth.currentUser),
-    // Firebase exige confirmar la contraseña actual antes de cambiarla
-    // Borra la cuenta: confirma la contraseña, elimina imágenes, datos personales y el usuario
-    async deleteAccount(password) {
+    // Borra la cuenta: pide confirmar con Google, elimina imágenes, datos personales y el usuario
+    async deleteAccount() {
       const u = auth.currentUser;
-      await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, password));
+      await reauthenticateWithPopup(u, googleProvider);
       await deleteAllUserImages(u.uid);
       await deleteUserData(u.uid);
       await deleteUser(u);
-    },
-    async changePassword(currentPassword, newPassword) {
-      const u = auth.currentUser;
-      await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, currentPassword));
-      await updatePassword(u, newPassword);
-    },
-    async refreshVerification() {
-      await auth.currentUser.reload();
-      await auth.currentUser.getIdToken(true); // fuerza token con email_verified actualizado
-      setUser(auth.currentUser);
-      return auth.currentUser.emailVerified;
     },
   };
 

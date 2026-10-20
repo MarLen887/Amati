@@ -28,7 +28,6 @@ export default function MyData() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [confirming, setConfirming] = useState(false);
-  const [password, setPassword] = useState('');
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState('');
 
@@ -56,7 +55,7 @@ export default function MyData() {
     setBusy(true);
     setError('');
     try {
-      await deleteAccount(password);
+      await deleteAccount();
       // Al borrarse el usuario, la app regresa sola a la pantalla de inicio de sesión
     } catch (err) {
       setError(authErrorMessage(err));
@@ -89,27 +88,23 @@ export default function MyData() {
         <form className="stack danger-zone unfold" onSubmit={doDelete}>
           <p><strong>Se eliminarán para siempre</strong> tu cuenta, materias, tarjetas, apuntes, notas de clase, historial y sesiones.</p>
           <p className="small muted">
-            Las imágenes y PDFs que subiste se guardan en Cloudinary: se borran sus enlaces de Amati y nadie podrá
-            encontrarlos desde la app, pero los archivos en sí se retiran manualmente de ese servicio. Si quieres que se
-            eliminen, avisa a quien administra el proyecto.
+            Las imágenes y PDFs que subiste se guardan en un servicio externo de archivos: se borran sus enlaces de Amati
+            y nadie podrá encontrarlos desde la app, pero los archivos en sí se retiran manualmente de ese servicio. Si
+            quieres que se eliminen, avisa a quien administra el proyecto.
           </p>
           <p className="small muted">
             Los registros anónimos de la prueba piloto (historial de repaso y sesiones con un identificador anónimo, sin
             nombre ni correo) se conservan para la investigación, conforme al aviso de privacidad. Ya no podrán
             vincularse contigo.
           </p>
-          <label>
-            Escribe tu contraseña para confirmar
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-              autoComplete="current-password" />
-          </label>
+          <p className="small muted">Para confirmar que eres tú, se abrirá una ventana de Google antes de borrar la cuenta.</p>
           <label className="checkbox">
             <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
             Entiendo que esta acción no se puede deshacer.
           </label>
           {error && <p className="error">{error}</p>}
           <div className="row gap end">
-            <button type="button" className="btn ghost" onClick={() => { setConfirming(false); setPassword(''); setAgree(false); setError(''); }}>
+            <button type="button" className="btn ghost" onClick={() => { setConfirming(false); setAgree(false); setError(''); }}>
               Cancelar
             </button>
             <button className="btn danger-solid" disabled={busy}>{busy ? 'Borrando…' : 'Borrar definitivamente'}</button>

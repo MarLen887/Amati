@@ -12,7 +12,7 @@ import { examLabel } from '../subjects/ExamCountdown.jsx';
 import { SampleButton } from '../subjects/Subjects.jsx';
 import { usePomodoro } from '../pomodoro/PomodoroContext.jsx';
 import { useStudyStats } from '../progress/stats.js';
-import HowItWorks from './HowItWorks.jsx';
+import { ThemeSwitcher } from '../../core/context/ThemeContext.jsx';
 
 function greeting() {
   const h = new Date().getHours();
@@ -28,7 +28,6 @@ export default function Home() {
   const { state: pomoState } = usePomodoro();
   const stats = useStudyStats();
 
-  if (profile && profile.onboarded === false) return <HowItWorks firstTime />;
   if (loading) return <p className="muted">Cargando…</p>;
 
   const name = profile?.displayName || user?.displayName || '';
@@ -42,20 +41,24 @@ export default function Home() {
   const examDays = nextExam ? daysUntil(nextExam.examDate, now) : null;
   const last = readLastTechnique();
   const lastTech = last ? TECHNIQUE_MAP[last] : null;
-  const reviewTech = CARD_TECHNIQUES.includes(last) ? last : 'srs';
+  // Repasar tarjetas pendientes solo si esa fue la última técnica; si no, se elige técnica en Estudiar
+  const reviewUrl = CARD_TECHNIQUES.includes(last) ? `/estudiar?tecnica=${last}` : '/tecnicas';
   const due = dueCards.length;
 
   if (subjects.length === 0) {
     return (
       <div className="stack-lg">
         <header className="page-head">
+          <div className="row between home-top">
           <p className="muted capitalize">{fmtLong(now)}</p>
+          <div data-tour="theme"><ThemeSwitcher compact /></div>
+        </div>
           <h1 className="greeting">
             {greetingText.slice(0, cut)}
             <span className="nowrap">{greetingText.slice(cut)}<Hummingbird size={64} /></span>
           </h1>
         </header>
-        <section className="panel">
+        <section className="panel" data-tour="home-main">
           <EmptyState
             title="Empecemos"
             actions={
@@ -75,7 +78,10 @@ export default function Home() {
   return (
     <div className="stack-lg stagger">
       <header className="page-head">
-        <p className="muted capitalize">{fmtLong(now)}</p>
+        <div className="row between home-top">
+          <p className="muted capitalize">{fmtLong(now)}</p>
+          <div data-tour="theme"><ThemeSwitcher compact /></div>
+        </div>
         {/* El colibrí va unido a la última palabra para que siempre quede junto al saludo */}
         <h1 className="greeting">
           {greetingText.slice(0, cut)}
@@ -95,7 +101,16 @@ export default function Home() {
       {pomoState?.active ? (
         <Link to={pomoState.url} className="btn primary xl block"><Timer size={22} aria-hidden="true" /> Volver al Pomodoro en curso</Link>
       ) : (
-        <Link to="/tecnicas" className="btn primary xl block breathe-btn"><Play size={22} fill="currentColor" aria-hidden="true" /> Empezar sesión de estudio</Link>
+        <div className="stack-sm" data-tour="home-main">
+          {lastTech ? (
+            <>
+              <Link to={techniqueUrl(last, { practice: due === 0 })} className="btn primary xl block breathe-btn"><Play size={22} fill="currentColor" aria-hidden="true" /> Continuar con {lastTech.name}</Link>
+              <p className="center-text small"><Link to="/tecnicas">Elegir otra técnica</Link></p>
+            </>
+          ) : (
+            <Link to="/tecnicas" className="btn primary xl block breathe-btn"><Play size={22} fill="currentColor" aria-hidden="true" /> Empezar sesión de estudio</Link>
+          )}
+        </div>
       )}
 
       {nextExam && (
@@ -106,17 +121,6 @@ export default function Home() {
             <Link to={`/materias/${nextExam.id}`} className="next-exam-name">{nextExam.name}</Link>
             <p className="small">{examLabel(examDays)} · {fmtShort(nextExam.examDate)}</p>
           </div>
-        </section>
-      )}
-
-      {lastTech && (
-        <section className="panel continue-row">
-          <span className="technique-icon"><TechniqueIcon name={lastTech.icon} /></span>
-          <div className="grow">
-            <p className="eyebrow">Continuar donde te quedaste</p>
-            <strong>{lastTech.name}</strong>
-          </div>
-          <Link to={techniqueUrl(last, { practice: due === 0 })} className="btn ghost">Continuar</Link>
         </section>
       )}
 
@@ -135,7 +139,7 @@ export default function Home() {
             <p className="eyebrow">Repaso pendiente</p>
             <p><strong>{due}</strong> {due === 1 ? 'tarjeta lista' : 'tarjetas listas'} para repasar</p>
           </div>
-          <Link to={`/estudiar?tecnica=${reviewTech}`} className="btn ghost">Repasar ahora <ArrowRight size={16} aria-hidden="true" /></Link>
+          <Link to={reviewUrl} className="btn ghost">Repasar ahora <ArrowRight size={16} aria-hidden="true" /></Link>
         </section>
       )}
     </div>

@@ -140,7 +140,7 @@ function Detail({ note }) {
         <input className="title-input" value={title} onChange={(e) => touch(setTitle)(e.target.value)} maxLength={200} aria-label="Título" />
         <p className="small muted">
           {note.classDate ? `Clase del ${fmtLong(note.classDate)}` : ''}
-          {file && <> · {file.provider === 'drive' ? 'Google Drive' : 'Cloudinary'}{file.kind === 'pdf'
+          {file && <>{file.provider === 'drive' ? ' · Google Drive' : ''}{file.kind === 'pdf'
             ? <> · <button type="button" className="link-btn" disabled={!!busy} onClick={downloadOriginal}>Descargar PDF <Download size={12} aria-hidden="true" /></button></>
             : file.url && <> · <a href={file.url} target="_blank" rel="noreferrer noopener">Abrir original <ExternalLink size={12} aria-hidden="true" /></a></>}</>}
         </p>

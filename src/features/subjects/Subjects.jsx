@@ -81,7 +81,7 @@ export default function Subjects() {
           <h1>Mis materias</h1>
         </div>
         {!adding && subjects.length > 0 && (
-          <button className="btn ghost" onClick={() => setAdding(true)}><Plus size={16} aria-hidden="true" /> Nueva materia</button>
+          <button className="btn ghost" data-tour="subjects-add" onClick={() => setAdding(true)}><Plus size={16} aria-hidden="true" /> Nueva materia</button>
         )}
       </header>
 
@@ -91,7 +91,7 @@ export default function Subjects() {
             title="Tu primera materia"
             actions={
               <>
-                <button className="btn primary" onClick={() => setAdding(true)}><Plus size={16} /> Crear materia</button>
+                <button className="btn primary" data-tour="subjects-add" onClick={() => setAdding(true)}><Plus size={16} /> Crear materia</button>
                 <SampleButton />
               </>
             }
@@ -104,19 +104,19 @@ export default function Subjects() {
       {adding && (
         <section className="panel">
           <h2 className="h3">Nueva materia</h2>
-          <p className="small muted">Una materia agrupa tus tarjetas y apuntes. Solo necesitas el nombre; lo demás es opcional.</p>
+          <p className="small muted">Una materia reúne tus apuntes, recursos y tarjetas. Solo necesitas el nombre; lo demás es opcional.</p>
           <SubjectEditor
             onSave={async (d) => {
-              const ref = await createSubject(user.uid, d);
+              await createSubject(user.uid, d);
               setParams({}, { replace: true });
-              nav(`/materias/${ref.id}?nuevo=1`);
+              setAdding(false);
             }}
             onCancel={() => setAdding(false)}
           />
         </section>
       )}
 
-      <ul className="subject-grid">
+      <ul className="subject-grid" data-tour="subjects-main">
         {subjects.map((s) => (
           <SubjectCard key={s.id} s={s} cards={cards} now={now} onEdit={() => setEditing(s)} onRemove={() => setDeleting(s)} />
         ))}

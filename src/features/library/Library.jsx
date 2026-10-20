@@ -222,7 +222,7 @@ export default function Library() {
         </section>
       ) : (
         <>
-          <form className="search-bar" role="search" onSubmit={submit}>
+          <form className="search-bar" role="search" onSubmit={submit} data-tour="library-search">
             <SearchIcon size={18} aria-hidden="true" />
             <input type="search" value={input} onChange={(e) => setInput(e.target.value)} autoFocus={!q}
               placeholder="¿Qué quieres aprender? Ej. cálculo, Don Quijote…" aria-label="Buscar recursos" maxLength={120} />
@@ -230,7 +230,7 @@ export default function Library() {
             <button className="btn primary" disabled={!input.trim()}>Buscar</button>
           </form>
 
-          <div className="chips" role="group" aria-label="Categoría">
+          <div className="chips" role="group" aria-label="Categoría" data-tour="library-cats">
             {CATEGORIES.map(({ id, label, Icon }) => (
               <button key={id} type="button" className={`chip ${cat === id ? 'active' : ''}`} aria-pressed={cat === id} onClick={() => go({ cat: id })}>
                 <Icon size={14} aria-hidden="true" /> {label}

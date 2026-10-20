@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { authErrorMessage, useAuth } from '../../core/context/AuthContext.jsx';
 import { ALLOWED_DOMAIN } from '../../core/firebase.js';
 import Logo from '../../core/components/Logo.jsx';
@@ -12,38 +12,30 @@ export const PRIVACY_NOTICE =
   'informes institucionales. Ningún dato será compartido con terceros ajenos al proyecto ni utilizado ' +
   'para fines comerciales o de prospección.';
 
-function AuthShell({ title, subtitle, children, footer }) {
+function GoogleMark() {
   return (
-    <div className="auth-page">
-      <Ambient />
-      <div className="auth-theme"><ThemeSwitcher compact /></div>
-      <div className="auth-card">
-        <div className="auth-brand">
-          <Logo size={72} />
-          <h1>{title}</h1>
-          {subtitle && <p className="muted">{subtitle}</p>}
-        </div>
-        {children}
-        {footer && <div className="auth-footer">{footer}</div>}
-      </div>
-    </div>
+    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z" />
+      <path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z" />
+      <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z" />
+    </svg>
   );
 }
 
+// Pantalla única de acceso: «Continuar con Google» (sin contraseñas)
 export function Login() {
-  const { login } = useAuth();
+  const { loginWithGoogle, authNotice, clearAuthNotice } = useAuth();
   const nav = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  async function submit(e) {
-    e.preventDefault();
+  async function start() {
     setBusy(true);
     setError('');
+    clearAuthNotice();
     try {
-      await login({ email, password });
+      await loginWithGoogle();
       nav('/');
     } catch (err) {
       setError(authErrorMessage(err));
@@ -52,173 +44,38 @@ export function Login() {
     }
   }
 
-  return (
-    <AuthShell
-      title="Amati"
-      subtitle="Estudia un poco cada día, sin estrés."
-      footer={<>¿No tienes cuenta? <Link to="/registro">Regístrate</Link></>}
-    >
-      <form onSubmit={submit} className="stack">
-        <label>
-          Correo institucional
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-            placeholder={`matrícula@${ALLOWED_DOMAIN}`} autoComplete="email" />
-        </label>
-        <label>
-          Contraseña
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-            autoComplete="current-password" />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button className="btn primary block" disabled={busy}>{busy ? 'Entrando…' : 'Iniciar sesión'}</button>
-        <Link to="/recuperar" className="small center-text">¿Olvidaste tu contraseña?</Link>
-      </form>
-    </AuthShell>
-  );
-}
-
-export function Register() {
-  const { register } = useAuth();
-  const nav = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
-  const [accepted, setAccepted] = useState(false);
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
-
-  async function submit(e) {
-    e.preventDefault();
-    setError('');
-    if (form.password.length < 6) return setError('La contraseña debe tener al menos 6 caracteres.');
-    if (form.password !== form.confirm) return setError('Las contraseñas no coinciden.');
-    if (!accepted) return setError('Debes aceptar el aviso de privacidad.');
-    setBusy(true);
-    try {
-      await register(form);
-      nav('/verificar');
-    } catch (err) {
-      setError(authErrorMessage(err));
-    } finally {
-      setBusy(false);
-    }
-  }
+  const message = error || authNotice;
 
   return (
-    <AuthShell
-      title="Crea tu cuenta"
-      subtitle={`Solo para la comunidad UVP (@${ALLOWED_DOMAIN}).`}
-      footer={<>¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link></>}
-    >
-      <form onSubmit={submit} className="stack">
-        <label>
-          Nombre (cómo quieres que te llamemos)
-          <input value={form.name} onChange={set('name')} maxLength={60} autoComplete="given-name" />
-        </label>
-        <label>
-          Correo institucional
-          <input type="email" value={form.email} onChange={set('email')} required
-            placeholder={`matrícula@${ALLOWED_DOMAIN}`} autoComplete="email" />
-        </label>
-        <div className="grid-2">
-          <label>
-            Contraseña
-            <input type="password" value={form.password} onChange={set('password')} required minLength={6}
-              autoComplete="new-password" />
-          </label>
-          <label>
-            Confirmar contraseña
-            <input type="password" value={form.confirm} onChange={set('confirm')} required
-              autoComplete="new-password" />
-          </label>
+    <div className="auth-page">
+      <Ambient />
+      <div className="auth-theme"><ThemeSwitcher compact /></div>
+      <div className="auth-card">
+        <div className="auth-brand">
+          <Logo size={72} />
+          <h1>Amati</h1>
+          <p className="muted">Estudia un poco cada día, sin estrés.</p>
         </div>
+
+        <div className="stack">
+          <button type="button" className="btn google-btn block" onClick={start} disabled={busy}>
+            <GoogleMark /> {busy ? 'Abriendo Google…' : 'Continuar con Google'}
+          </button>
+          <p className="small muted center-text">Usa tu cuenta institucional <strong>@{ALLOWED_DOMAIN}</strong>. No necesitas contraseña.</p>
+          {message && <p className="error" role="alert">{message}</p>}
+        </div>
+
         <details className="privacy">
           <summary>Aviso de privacidad</summary>
           <p>{PRIVACY_NOTICE}</p>
           <p>
             Para la prueba piloto, Amati registra de forma anónima tu historial de repaso y de sesiones de estudio.
-            Tus tarjetas y tu correo no se incluyen en
-            los datos de investigación. Puedes descargar tus datos o borrar tu cuenta en Ajustes; al borrarla
-            se eliminan tus datos personales y solo se conservan esos registros anónimos.
+            Tus tarjetas y tu correo no se incluyen en los datos de investigación. Puedes descargar tus datos o borrar
+            tu cuenta en tu perfil; al borrarla se eliminan tus datos personales y solo se conservan esos registros anónimos.
           </p>
         </details>
-        <label className="checkbox">
-          <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
-          He leído y acepto el aviso de privacidad.
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button className="btn primary block" disabled={busy}>{busy ? 'Creando cuenta…' : 'Registrarme'}</button>
-      </form>
-    </AuthShell>
-  );
-}
-
-export function VerifyEmail() {
-  const { user, resendVerification, refreshVerification, logout } = useAuth();
-  const nav = useNavigate();
-  const [msg, setMsg] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  async function check() {
-    setBusy(true);
-    try {
-      const ok = await refreshVerification();
-      if (ok) nav('/');
-      else setMsg('Aún no vemos tu correo verificado. Revisa tu bandeja (y la carpeta de spam).');
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function resend() {
-    try {
-      await resendVerification();
-      setMsg('Te enviamos un nuevo correo de verificación.');
-    } catch (err) {
-      setMsg(authErrorMessage(err));
-    }
-  }
-
-  return (
-    <AuthShell title="Verifica tu correo" subtitle={`Enviamos un enlace a ${user?.email}.`}>
-      <div className="stack">
-        <p>Abre el enlace del correo para activar tu cuenta y después presiona el botón.</p>
-        {msg && <p className="notice">{msg}</p>}
-        <button className="btn primary block" onClick={check} disabled={busy}>Ya verifiqué mi correo</button>
-        <button className="btn ghost block" onClick={resend}>Reenviar correo</button>
-        <button className="btn link" onClick={logout}>Usar otra cuenta</button>
+        <p className="auth-footer">Al continuar aceptas el aviso de privacidad.</p>
       </div>
-    </AuthShell>
-  );
-}
-
-export function ForgotPassword() {
-  const { resetPassword } = useAuth();
-  const [email, setEmail] = useState('');
-  const [msg, setMsg] = useState('');
-  const [error, setError] = useState('');
-
-  async function submit(e) {
-    e.preventDefault();
-    setError('');
-    try {
-      await resetPassword(email);
-      setMsg('Si existe una cuenta con ese correo, recibirás un enlace para restablecer tu contraseña.');
-    } catch (err) {
-      setError(authErrorMessage(err));
-    }
-  }
-
-  return (
-    <AuthShell title="Recuperar contraseña" footer={<Link to="/login">Volver a iniciar sesión</Link>}>
-      <form onSubmit={submit} className="stack">
-        <label>
-          Correo institucional
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </label>
-        {msg && <p className="notice">{msg}</p>}
-        {error && <p className="error">{error}</p>}
-        <button className="btn primary block">Enviar enlace</button>
-      </form>
-    </AuthShell>
+    </div>
   );
 }

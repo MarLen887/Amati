@@ -3,10 +3,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../core/context/AuthContext.jsx';
 import { updateProfile } from '../../core/data/db.js';
 import { PRIVACY_NOTICE } from '../auth/AuthPages.jsx';
-import { ThemeSwitcher } from '../../core/context/ThemeContext.jsx';
-import ChangePassword from '../auth/ChangePassword.jsx';
 import PomodoroSettings from './PomodoroSettings.jsx';
 import MyData from './MyData.jsx';
+import HelpCenter from '../tutorial/HelpCenter.jsx';
 
 const HOURS = Array.from({ length: 17 }, (_, i) => i + 6); // 6:00 a 22:00
 
@@ -87,22 +86,7 @@ export default function Settings() {
 
       <PomodoroSettings />
 
-      <ChangePassword />
-
-      <section className="panel stack">
-        <h2 className="h3">Apariencia</h2>
-        <p className="small muted">Elige cómo se ve Amati en este dispositivo.</p>
-        <ThemeSwitcher />
-      </section>
-
-      <section className="panel stack">
-        <h2 className="h3">Ayuda</h2>
-        <Link to="/como-funciona">¿Cómo funciona Amati?</Link>
-        <details className="privacy">
-          <summary>Aviso de privacidad</summary>
-          <p>{PRIVACY_NOTICE}</p>
-        </details>
-      </section>
+      <HelpCenter />
 
       <MyData />
 

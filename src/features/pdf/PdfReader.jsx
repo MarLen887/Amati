@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import { highlightPlugin, Trigger } from '@react-pdf-viewer/highlight';
@@ -17,8 +17,14 @@ const themeNow = () => {
 // Lector de PDF (React PDF Viewer) con resaltado y comentarios.
 // annotations: [{ id, quote, comment, highlightAreas }]  ·  onChange(nuevas) las guarda quien lo use.
 export default function PdfReader({ blob, annotations = [], onChange, readOnly = false }) {
-  const url = useMemo(() => URL.createObjectURL(blob), [blob]);
-  useEffect(() => () => URL.revokeObjectURL(url), [url]);
+  // La dirección temporal se crea y se libera dentro del efecto: si se creara al renderizar, React (modo estricto)
+  // la liberaría antes de que el visor la use y el PDF fallaría con «Unexpected server response (0)».
+  const [url, setUrl] = useState(null);
+  useEffect(() => {
+    const u = URL.createObjectURL(blob);
+    setUrl(u);
+    return () => URL.revokeObjectURL(u);
+  }, [blob]);
   const [selected, setSelected] = useState(null);
 
   // Barra compacta: página «1 / 3» siempre en una sola línea, zoom y búsqueda; el resto sobra en pantallas chicas
@@ -72,7 +78,7 @@ export default function PdfReader({ blob, annotations = [], onChange, readOnly =
     <div className="pdf-reader">
       <div className="pdf-main">
         <Worker workerUrl={workerUrl}>
-          <Viewer fileUrl={url} theme={themeNow()} plugins={[layout, highlight]} />
+          {url ? <Viewer fileUrl={url} theme={themeNow()} plugins={[layout, highlight]} /> : <p className="muted small">Abriendo PDF…</p>}
         </Worker>
       </div>
       <aside className="pdf-notes" aria-label="Anotaciones">

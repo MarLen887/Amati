@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from '../core/context/AuthContext.jsx';
 import { DataProvider } from '../core/context/DataContext.jsx';
 import { isConfigured } from '../core/firebase.js';
 import Layout from '../core/components/Layout.jsx';
-import { ForgotPassword, Login, Register, VerifyEmail } from '../features/auth/AuthPages.jsx';
+import { Login } from '../features/auth/AuthPages.jsx';
 import Home from '../features/home/Home.jsx';
 import HowItWorks from '../features/home/HowItWorks.jsx';
 import Subjects from '../features/subjects/Subjects.jsx';
@@ -35,27 +35,18 @@ function Loading() {
   return <div className="center-screen muted">Cargando…</div>;
 }
 
-// Solo usuarios con sesión y correo verificado
+// Solo usuarios con sesión (Google ya verifica el correo institucional)
 function Private({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <Loading />;
   if (!user) return <Navigate to="/login" replace />;
-  if (!user.emailVerified) return <Navigate to="/verificar" replace />;
   return children;
 }
 
 function PublicOnly({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <Loading />;
-  if (user) return <Navigate to={user.emailVerified ? '/' : '/verificar'} replace />;
-  return children;
-}
-
-function NeedsUnverified({ children }) {
-  const { user, loading } = useAuth();
-  if (loading) return <Loading />;
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.emailVerified) return <Navigate to="/" replace />;
+  if (user) return <Navigate to="/" replace />;
   return children;
 }
 
@@ -86,9 +77,10 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<PublicOnly><Login /></PublicOnly>} />
-          <Route path="/registro" element={<PublicOnly><Register /></PublicOnly>} />
-          <Route path="/recuperar" element={<PublicOnly><ForgotPassword /></PublicOnly>} />
-          <Route path="/verificar" element={<NeedsUnverified><VerifyEmail /></NeedsUnverified>} />
+          {/* Antes había registro con contraseña: esas direcciones ahora llevan al acceso con Google */}
+          <Route path="/registro" element={<Navigate to="/login" replace />} />
+          <Route path="/recuperar" element={<Navigate to="/login" replace />} />
+          <Route path="/verificar" element={<Navigate to="/login" replace />} />
           <Route
             element={
               <Private>

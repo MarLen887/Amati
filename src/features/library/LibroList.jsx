@@ -69,7 +69,7 @@ export default function LibroList({ subjectId = '', showFilters = true }) {
                     <ExternalLink size={14} aria-hidden="true" /> Información
                   </a>
                 )}
-                <Link className="btn small ghost" to={`/apuntes/nuevo?${new URLSearchParams({ tipo: 'pq4r', fuente: l.title, ...(l.subjectId ? { materia: l.subjectId } : {}) })}`}>PQ4R</Link>
+                <Link className="btn small ghost" to={`/apuntes/nuevo?${new URLSearchParams({ tipo: 'pq4r', fuente: l.title, ...(l.subjectId ? { materia: l.subjectId } : {}) })}`} >PQ4R</Link>
                 <button className="btn small ghost danger" onClick={() => confirm(`¿Quitar «${l.title}» de tu biblioteca?`) && deleteLibro(user.uid, l.id)}>Quitar</button>
               </div>
             </li>
