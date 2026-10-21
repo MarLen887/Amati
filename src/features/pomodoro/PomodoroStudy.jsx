@@ -12,6 +12,7 @@ import Celebrate from '../../core/components/Celebrate.jsx';
 import FlashcardView from '../techniques/cards/FlashcardView.jsx';
 import PomodoroRing from './PomodoroRing.jsx';
 import PomodoroBreak from './PomodoroBreak.jsx';
+import Skeleton from '../../core/components/Skeleton.jsx';
 
 const HIDE_KEY = 'amati-pomo-hide-time';
 
@@ -92,7 +93,7 @@ export default function PomodoroStudy() {
     }
   });
 
-  if (loading || !profile) return <p className="muted">Cargando…</p>;
+  if (loading || !profile) return <Skeleton variant="detail" />;
 
   if (!resuming && selection.length === 0 && step !== 'summary') {
     return (

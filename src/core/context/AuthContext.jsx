@@ -99,7 +99,11 @@ export function AuthProvider({ children }) {
         throw err;
       }
     },
-    logout: () => signOut(auth),
+    // Al cerrar sesión se olvida qué se mostró en esta sesión (el video de bienvenida vuelve a salir al iniciar otra)
+    logout: () => {
+      try { Object.keys(sessionStorage).filter((k) => k.startsWith('amati-video-session-')).forEach((k) => sessionStorage.removeItem(k)); } catch { /* sin almacenamiento */ }
+      return signOut(auth);
+    },
     // Borra la cuenta: pide confirmar con Google, elimina imágenes, datos personales y el usuario
     async deleteAccount() {
       const u = auth.currentUser;

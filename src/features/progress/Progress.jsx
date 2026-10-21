@@ -3,6 +3,7 @@ import { Clock, Flame, Layers, ShieldCheck } from 'lucide-react';
 import { useData } from '../../core/context/DataContext.jsx';
 import { cardStatus } from '../techniques/cards/srs.js';
 import { formatMinutes, useStudyStats } from './stats.js';
+import Skeleton from '../../core/components/Skeleton.jsx';
 
 // Progreso: solo cuatro números, sin gráficas.
 function Metric({ Icon, value, label, tone, hint }) {
@@ -20,7 +21,7 @@ export default function Progress() {
   const { cards, dueCards, loading } = useData();
   const stats = useStudyStats();
 
-  if (loading) return <p className="muted">Cargando…</p>;
+  if (loading) return <Skeleton variant="cards" />;
 
   const mastered = cards.filter((c) => cardStatus(c) === 'mastered').length;
   const days = stats.streak;

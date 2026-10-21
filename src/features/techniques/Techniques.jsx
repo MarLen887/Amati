@@ -6,6 +6,7 @@ import { GOALS, GROUPS, readLastTechnique, saveLastTechnique, TECHNIQUE_MAP, TEC
 import { matchesSelection, topicsOf } from './cards/studyFilter.js';
 import { daysUntil } from './cards/srs.js';
 import TechniqueIcon from './TechniqueIcon.jsx';
+import Skeleton from '../../core/components/Skeleton.jsx';
 
 // Estudiar: ¿qué quieres lograr? -> hasta 3 técnicas recomendadas -> «Empezar sesión».
 export default function Techniques() {
@@ -26,7 +27,7 @@ export default function Techniques() {
     [subjects, now],
   );
 
-  if (loading) return <p className="muted">Cargando…</p>;
+  if (loading) return <Skeleton variant="cards" />;
 
   function update(next) {
     const p = new URLSearchParams(params);

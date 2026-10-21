@@ -6,6 +6,7 @@ import { PRIVACY_NOTICE } from '../auth/AuthPages.jsx';
 import PomodoroSettings from './PomodoroSettings.jsx';
 import MyData from './MyData.jsx';
 import HelpCenter from '../tutorial/HelpCenter.jsx';
+import Skeleton from '../../core/components/Skeleton.jsx';
 
 const HOURS = Array.from({ length: 17 }, (_, i) => i + 6); // 6:00 a 22:00
 
@@ -23,7 +24,7 @@ export default function Settings() {
     }
   }, [profile?.displayName, profile?.reminders?.emailEnabled, profile?.reminders?.hour, profile?.reminders?.inApp]);
 
-  if (!profile || !reminders) return <p className="muted">Cargando…</p>;
+  if (!profile || !reminders) return <Skeleton variant="detail" />;
 
   async function save(e) {
     e.preventDefault();

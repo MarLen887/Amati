@@ -20,6 +20,7 @@ import UploadPdf from '../library/UploadPdf.jsx';
 import { ClassNotesList } from '../classnotes/ClassNotes.jsx';
 import { NOTE_TYPES, techniqueUrl } from '../techniques/techniques.js';
 import TechniqueChip from '../techniques/TechniqueChip.jsx';
+import Skeleton from '../../core/components/Skeleton.jsx';
 
 const STATUS_LABEL = { new: 'Nueva', learning: 'Aprendiendo', mastered: 'Dominada' };
 
@@ -69,7 +70,7 @@ export default function SubjectDetail() {
     [subjectCards],
   );
 
-  if (loading) return <p className="muted">Cargando…</p>;
+  if (loading) return <Skeleton variant="detail" />;
   if (!subject) return <p>Materia no encontrada. <Link to="/materias">Volver</Link></p>;
 
   const q = search.trim().toLowerCase();

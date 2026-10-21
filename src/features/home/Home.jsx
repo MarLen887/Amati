@@ -13,6 +13,7 @@ import { SampleButton } from '../subjects/Subjects.jsx';
 import { usePomodoro } from '../pomodoro/PomodoroContext.jsx';
 import { useStudyStats } from '../progress/stats.js';
 import { ThemeSwitcher } from '../../core/context/ThemeContext.jsx';
+import Skeleton from '../../core/components/Skeleton.jsx';
 
 function greeting() {
   const h = new Date().getHours();
@@ -28,7 +29,7 @@ export default function Home() {
   const { state: pomoState } = usePomodoro();
   const stats = useStudyStats();
 
-  if (loading) return <p className="muted">Cargando…</p>;
+  if (loading) return <Skeleton variant="cards" />;
 
   const name = profile?.displayName || user?.displayName || '';
   const greetingText = `${greeting()}${name ? `, ${name.split(' ')[0]}` : ''}`;

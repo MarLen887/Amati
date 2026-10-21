@@ -205,6 +205,7 @@ Para quitar el acceso, borra su documento en `admins`.
 | `npm run dev` | Inicia la app en modo desarrollo (http://localhost:5173) |
 | `npm run build` | Genera la versión optimizada en la carpeta `dist/` |
 | `npm run preview` | Prueba localmente la versión de `dist/` |
+| `npm test` | Ejecuta las pruebas automáticas del repaso espaciado (no instala nada extra) |
 | `npm run deploy` | Compila y publica **solo la app** (Hosting) en Firebase |
 | `git pull` | Descarga los últimos cambios del repositorio |
 
@@ -532,6 +533,8 @@ admins/{correo}              administradores del panel de investigación
 **Centro de ayuda (Perfil):** botones para **ver el video otra vez** y **repetir el recorrido**, y **preguntas frecuentes** desplegables con búsqueda.
 
 **Cómo agregar el video:** el guion y la guía de producción están en [`docs/guion-video-bienvenida.md`](docs/guion-video-bienvenida.md). Sube el video a YouTube como «No listado» y pon el enlace en `VITE_WELCOME_VIDEO` (paso 4). Mientras esa variable esté vacía, el tutorial funciona solo con el recorrido.
+
+**Cuándo se abre:** el video y el recorrido con globos salen la primera vez y después una vez en cada inicio de sesión (el video lleva al recorrido), con el botón **«No volver a mostrar»** (se guarda en el perfil como `welcomeVideoHidden`); al pulsarlo aparece el aviso «Podrás verlo de nuevo en tu perfil». Siempre se puede ver desde Perfil → Centro de ayuda.
 
 **Cómo editar el contenido:**
 

@@ -42,3 +42,14 @@
 .faq-item > div { padding: 0 0.9rem 0.85rem; color: var(--text); line-height: 1.55; }
 .faq-item > div p { margin: 0 0 0.5rem; }
 .faq-item mark { background: color-mix(in srgb, var(--pending) 30%, transparent); color: inherit; border-radius: 3px; }
+
+/* Aviso breve tras «No volver a mostrar» */
+.video-toast { position: fixed; left: 50%; bottom: 1.5rem; transform: translateX(-50%); z-index: 130; max-width: calc(100vw - 2rem); padding: 0.7rem 1.1rem; border-radius: 999px; background: #121a2e; color: #fff; font-weight: 600; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3); animation: pop-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+
+/* Centro de ayuda: tarjetas por sección y ventana con las preguntas */
+.help-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.7rem; }
+.help-card { display: grid; justify-items: start; gap: 0.25rem; padding: 0.85rem 0.9rem; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); color: var(--text); text-align: left; cursor: pointer; transition: transform 0.2s ease, border-color 0.2s, box-shadow 0.2s; }
+.help-card > svg { color: var(--navy); margin-bottom: 0.2rem; }
+.help-card:hover, .help-card:focus-visible { transform: translateY(-2px); border-color: var(--navy); box-shadow: 0 8px 20px color-mix(in srgb, var(--navy) 14%, transparent); }
+.help-modal { width: min(40rem, 100%); max-height: min(85vh, 40rem); display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 0.8rem; padding: 1rem 1.1rem 1.1rem; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4); animation: pop-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.help-modal-body { display: grid; gap: 0.5rem; align-content: start; overflow-y: auto; padding-right: 0.2rem; }

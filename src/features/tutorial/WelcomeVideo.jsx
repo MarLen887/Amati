@@ -14,7 +14,7 @@ export const VIDEO_ID = parseVideoId(import.meta.env.VITE_WELCOME_VIDEO);
 export const hasVideo = Boolean(VIDEO_ID);
 
 // Ventana con el video. «Omitir» siempre está a la vista; al terminar el video se avisa solo (onEnded).
-export default function WelcomeVideo({ onSkip, onEnded, thenTour }) {
+export default function WelcomeVideo({ onSkip, onEnded, onHide, thenTour }) {
   const frame = useRef(null);
 
   useEffect(() => {
@@ -70,6 +70,7 @@ export default function WelcomeVideo({ onSkip, onEnded, thenTour }) {
         )}
 
         <div className="row gap wrap end">
+          {onHide && <button type="button" className="btn ghost" onClick={onHide}>No volver a mostrar</button>}
           {thenTour ? (
             <button type="button" className="btn primary" onClick={onEnded}>Continuar con el recorrido</button>
           ) : (

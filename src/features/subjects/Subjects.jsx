@@ -10,6 +10,7 @@ import MoreMenu from '../../core/components/MoreMenu.jsx';
 import { ExamChip } from './ExamCountdown.jsx';
 import SubjectEditor from './SubjectEditor.jsx';
 import { DeleteSubjectModal, EditSubjectModal } from './SubjectModals.jsx';
+import Skeleton from '../../core/components/Skeleton.jsx';
 
 export function SampleButton({ className = 'btn ghost' }) {
   const { user } = useAuth();
@@ -71,7 +72,7 @@ export default function Subjects() {
   const [deleting, setDeleting] = useState(null); // materia que se elimina en el modal
   const [adding, setAdding] = useState(params.get('nueva') === '1');
 
-  if (loading) return <p className="muted">Cargando…</p>;
+  if (loading) return <Skeleton variant="cards" />;
 
   return (
     <div className="stack-lg">

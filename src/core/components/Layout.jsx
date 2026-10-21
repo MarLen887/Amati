@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
 import Logo from './Logo.jsx';
 import { BookMarked, ChartLine, GraduationCap, House, Library, Menu, NotebookPen, User, Wrench, X } from 'lucide-react';
 import Ambient from './Ambient.jsx';
+import ErrorBoundary from './ErrorBoundary.jsx';
 import PomodoroPill from '../../features/pomodoro/PomodoroPill.jsx';
 import { TutorialProvider } from '../../features/tutorial/TutorialContext.jsx';
 
@@ -24,6 +25,17 @@ const NAV = [
 const isActive = (n, pathname) =>
   n.to === '/' ? pathname === '/' : n.match.some((m) => pathname === m || pathname.startsWith(`${m}/`));
 
+// Título de la pestaña por pantalla (lo leen los lectores de pantalla al cambiar de página)
+const TITLES = [
+  ['/materias', 'Mis materias'], ['/tecnicas', 'Estudiar'], ['/estudiar', 'Repaso de tarjetas'], ['/pomodoro', 'Pomodoro'],
+  ['/biblioteca', 'Biblioteca'], ['/apuntes', 'Apuntes'], ['/clases', 'Apuntes'], ['/herramientas', 'Herramientas'],
+  ['/progreso', 'Progreso'], ['/perfil', 'Perfil y ayuda'], ['/ajustes', 'Perfil y ayuda'], ['/como-funciona', '¿Cómo funciona?'], ['/admin', 'Administración'],
+];
+export const pageTitle = (pathname) => {
+  if (pathname === '/') return 'Inicio';
+  return TITLES.find(([p]) => pathname === p || pathname.startsWith(`${p}/`))?.[1] || '';
+};
+
 export default function Layout() {
   const { profile } = useAuth();
   const { dueCards } = useData();
@@ -31,6 +43,8 @@ export default function Layout() {
   const due = dueCards.length;
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const mainRef = useRef(null);
+  const firstRender = useRef(true);
 
   // El menú del celular se cierra al cambiar de pantalla o con Escape, y bloquea el scroll del fondo mientras está abierto
   useEffect(() => setMenuOpen(false), [pathname]);
@@ -45,12 +59,23 @@ export default function Layout() {
 
   // Notificación dentro de la app: contador discreto en la pestaña del navegador.
   useEffect(() => {
-    document.title = inApp && due > 0 ? `(${due}) Amati` : 'Amati';
-  }, [due, inApp]);
+    const page = pageTitle(pathname);
+    document.title = `${inApp && due > 0 ? `(${due}) ` : ''}${page ? `${page} · ` : ''}Amati`;
+  }, [due, inApp, pathname]);
+
+  // Al cambiar de pantalla el foco pasa al contenido (teclado y lector de pantalla); no al cargar la primera vez
+  useEffect(() => {
+    if (firstRender.current) { firstRender.current = false; return; }
+    if (document.activeElement?.closest?.('[role="dialog"]')) return; // no le quita el foco al recorrido ni a un modal
+    mainRef.current?.focus({ preventScroll: true });
+  }, [pathname]);
+
+  const skipToContent = (e) => { e.preventDefault(); mainRef.current?.focus(); mainRef.current?.scrollIntoView(); };
 
   return (
     <TutorialProvider>
     <div className="app-shell">
+      <a href="#contenido" className="skip-link" onClick={skipToContent}>Saltar al contenido</a>
       <Ambient />
       <header className="topbar">
         <Link to="/" className="brand" aria-label="Amati, ir al inicio">
@@ -79,8 +104,10 @@ export default function Layout() {
       </header>
 
       {/* key: cada cambio de pantalla vuelve a reproducir la animación de entrada */}
-      <main className="content page-enter" key={pathname}>
-        <Outlet />
+      <main id="contenido" ref={mainRef} tabIndex={-1} className="content page-enter" key={pathname}>
+        <ErrorBoundary resetKey={pathname}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       <PomodoroPill />

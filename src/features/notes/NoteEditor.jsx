@@ -12,6 +12,7 @@ import GuidedEditor from './GuidedEditor.jsx';
 import OutlineEditor from './OutlineEditor.jsx';
 import CornellEditor from './CornellEditor.jsx';
 import GenerateResources, { plainNote } from './GenerateResources.jsx';
+import Skeleton from '../../core/components/Skeleton.jsx';
 // El editor completo (TipTap, Yjs, KaTeX, Excalidraw) es pesado: se descarga solo al abrir un apunte libre
 const RichNoteLazy = lazy(() => import('./rich/RichNote.jsx'));
 const RichNote = (props) => <Suspense fallback={<p className="muted">Abriendo editor…</p>}><RichNoteLazy {...props} /></Suspense>;
@@ -169,7 +170,7 @@ export default function NoteEditor() {
   const { notes, notesLoaded } = useData();
 
   if (id) {
-    if (!notesLoaded) return <p className="muted">Cargando…</p>;
+    if (!notesLoaded) return <Skeleton variant="detail" />;
     const note = notes.find((n) => n.id === id);
     if (!note) return <p>Apunte no encontrado. <Link to="/apuntes">Ver mis apuntes</Link></p>;
     if (note.type === 'libre') return <RichNote key={note.id} ownerUid={user.uid} noteId={note.id} />;

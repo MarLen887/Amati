@@ -16,7 +16,7 @@ function findTarget(step) {
 }
 
 // Recorrido con globos: oscurece la pantalla, resalta la parte real y explica con «Siguiente» u «Omitir».
-export default function TourOverlay({ step, index, total, onNext, onBack, onSkip, actions }) {
+export default function TourOverlay({ step, index, total, onNext, onBack, onSkip, onHide, actions }) {
   const [rect, setRect] = useState(null); // null = sin objetivo (tarjeta central)
   const [ready, setReady] = useState(false);
   const pop = useRef(null);
@@ -138,9 +138,11 @@ export default function TourOverlay({ step, index, total, onNext, onBack, onSkip
                   <button type="button" className="btn link" onClick={actions.finish}>Ahora no</button>
                 </>
               )}
+              {onHide && <button type="button" className="btn link" onClick={onHide}>No volver a mostrar</button>}
             </div>
           ) : (
             <div className="tour-actions">
+              {onHide && <button type="button" className="btn link" onClick={onHide}>No volver a mostrar</button>}
               <span className="grow" />
               {index > 0 && <button type="button" className="btn link" onClick={onBack}>Atrás</button>}
               <button type="button" className="btn ghost small" onClick={onSkip}>Omitir</button>

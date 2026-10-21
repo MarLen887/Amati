@@ -13,6 +13,7 @@ import Breathing from '../../wellbeing/Breathing.jsx';
 import Celebrate from '../../../core/components/Celebrate.jsx';
 import { interleave, matchesSelection, SESSION_SIZE, studyUrl } from './studyFilter.js';
 import { CARD_TECHNIQUES, saveLastTechnique, TECHNIQUE_MAP } from '../techniques.js';
+import Skeleton from '../../../core/components/Skeleton.jsx';
 
 export function shuffle(arr) {
   const a = [...arr];
@@ -74,7 +75,7 @@ export default function Study() {
     }
   });
 
-  if (loading || !profile) return <p className="muted">Cargando…</p>;
+  if (loading || !profile) return <Skeleton variant="detail" />;
 
   if (step !== 'summary' && step !== 'closing' && queue.length === 0 && available.length === 0) {
     return (

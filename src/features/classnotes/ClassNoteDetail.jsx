@@ -12,6 +12,7 @@ import QuizPanel from '../notes/QuizPanel.jsx';
 import { has } from './api/integrations.js';
 import { fetchStoredBlob } from './api/pipeline.js';
 import PdfPanel from '../pdf/PdfPanel.jsx';
+import Skeleton from '../../core/components/Skeleton.jsx';
 
 function Viewer({ file }) {
   if (!file) return null;
@@ -263,7 +264,7 @@ function Detail({ note }) {
 export default function ClassNoteDetail() {
   const { id } = useParams();
   const { classNotes, loading } = useData();
-  if (loading) return <p className="muted">Cargando…</p>;
+  if (loading) return <Skeleton variant="detail" />;
   const note = classNotes.find((n) => n.id === id);
   if (!note) return <p>Nota no encontrada. <Link to="/apuntes">Ver mis apuntes</Link></p>;
   return <Detail key={note.id} note={note} />;
