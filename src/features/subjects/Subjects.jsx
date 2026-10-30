@@ -11,6 +11,7 @@ import { ExamChip } from './ExamCountdown.jsx';
 import SubjectEditor from './SubjectEditor.jsx';
 import { DeleteSubjectModal, EditSubjectModal } from './SubjectModals.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
+import BackLink from '../../core/components/BackLink.jsx';
 
 export function SampleButton({ className = 'btn ghost' }) {
   const { user } = useAuth();
@@ -36,7 +37,7 @@ export function SubjectCard({ s, cards, now, onEdit, onRemove }) {
     { label: s.sample ? 'Eliminar ejemplo' : 'Eliminar', onClick: onRemove, danger: true },
   ];
   return (
-    <li className="panel subject-card" style={{ borderTopColor: s.color }}>
+    <li className="panel subject-card" style={{ borderTopColor: s.color, '--sc': s.color }}>
       <div className="row between gap">
         <Link to={`/materias/${s.id}`} className="subject-link grow">
           <div className="row gap wrap">
@@ -78,7 +79,7 @@ export default function Subjects() {
     <div className="stack-lg">
       <header className="page-head row between wrap gap">
         <div>
-          <Link to="/tecnicas" className="small">← Estudiar</Link>
+          <BackLink to="/tecnicas">Estudiar</BackLink>
           <h1>Mis materias</h1>
         </div>
         {!adding && subjects.length > 0 && (

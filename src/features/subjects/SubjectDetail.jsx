@@ -21,6 +21,8 @@ import { ClassNotesList } from '../classnotes/ClassNotes.jsx';
 import { NOTE_TYPES, techniqueUrl } from '../techniques/techniques.js';
 import TechniqueChip from '../techniques/TechniqueChip.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
+import BackLink from '../../core/components/BackLink.jsx';
+import { useConfirm } from '../../core/components/ConfirmDialog.jsx';
 
 const STATUS_LABEL = { new: 'Nueva', learning: 'Aprendiendo', mastered: 'Dominada' };
 
@@ -39,6 +41,7 @@ function TipsCard() {
 }
 
 export default function SubjectDetail() {
+  const confirm = useConfirm();
   const { id } = useParams();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -83,7 +86,7 @@ export default function SubjectDetail() {
   const studyHref = `/tecnicas?materia=${id}${topicFilter ? `&tema=${encodeURIComponent(topicFilter)}` : ''}`;
 
   async function remove(c) {
-    if (confirm('¿Eliminar esta tarjeta?')) await deleteCard(user.uid, c);
+    if (await confirm({ title: '¿Eliminar esta tarjeta?', message: 'Esta acción no se puede deshacer.', confirmLabel: 'Eliminar', danger: true })) await deleteCard(user.uid, c);
   }
 
   const openAdd = () => { setAdding(true); setImporting(false); setCardsOpen(true); };
@@ -92,7 +95,7 @@ export default function SubjectDetail() {
   return (
     <div className="stack-lg">
       <div className="stack">
-        <Link to="/materias" className="small">← Materias</Link>
+        <BackLink to="/materias">Materias</BackLink>
         <div className="row between wrap gap">
           <h1 className="row gap">
             <span className="dot-color lg" style={{ background: subject.color }} />

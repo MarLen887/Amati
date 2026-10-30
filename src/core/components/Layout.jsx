@@ -6,7 +6,9 @@ import Logo from './Logo.jsx';
 import { BookMarked, ChartLine, GraduationCap, House, Library, Menu, NotebookPen, User, Wrench, X } from 'lucide-react';
 import Ambient from './Ambient.jsx';
 import ErrorBoundary from './ErrorBoundary.jsx';
+import FlyingBird from './FlyingBird.jsx';
 import PomodoroPill from '../../features/pomodoro/PomodoroPill.jsx';
+import { TOOLS } from '../../features/tools/tools.js';
 import { TutorialProvider } from '../../features/tutorial/TutorialContext.jsx';
 
 // Navegación centrada en lo que el estudiante quiere hacer.
@@ -27,12 +29,15 @@ const isActive = (n, pathname) =>
 
 // Título de la pestaña por pantalla (lo leen los lectores de pantalla al cambiar de página)
 const TITLES = [
+  ['/clases/nueva', 'Nuevo apunte de clase'], ['/apuntes/nuevo', 'Nuevo apunte'], // las rutas más específicas van primero
   ['/materias', 'Mis materias'], ['/tecnicas', 'Estudiar'], ['/estudiar', 'Repaso de tarjetas'], ['/pomodoro', 'Pomodoro'],
   ['/biblioteca', 'Biblioteca'], ['/apuntes', 'Apuntes'], ['/clases', 'Apuntes'], ['/herramientas', 'Herramientas'],
   ['/progreso', 'Progreso'], ['/perfil', 'Perfil y ayuda'], ['/ajustes', 'Perfil y ayuda'], ['/como-funciona', '¿Cómo funciona?'], ['/admin', 'Administración'],
 ];
 export const pageTitle = (pathname) => {
   if (pathname === '/') return 'Inicio';
+  const tool = pathname.startsWith('/herramientas/') && TOOLS.find((t) => pathname === `/herramientas/${t.id}`);
+  if (tool) return tool.name;
   return TITLES.find(([p]) => pathname === p || pathname.startsWith(`${p}/`))?.[1] || '';
 };
 
@@ -111,6 +116,7 @@ export default function Layout() {
       </main>
 
       <PomodoroPill />
+      <FlyingBird />
 
       {menuOpen && (
         <div className="menu-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setMenuOpen(false)}>

@@ -13,7 +13,7 @@ kbd {
 /* ---------- Navegación ---------- */
 .topbar-actions { display: flex; align-items: center; gap: 0.6rem; }
 .bottom-nav { grid-template-columns: repeat(7, 1fr); }
-.bottom-link { font-size: 0.68rem; }
+.bottom-link { font-size: 0.72rem; }
 .nav-link { padding: 0.45rem 0.7rem; }
 @media (max-width: 759px) { .create-label { display: none; } .create-menu .btn { padding: 0.4rem 0.55rem; } }
 .create-menu { position: relative; }
@@ -93,7 +93,7 @@ kbd {
   font-size: 0.78rem; gap: 0.1rem; transition: transform 0.25s, border-color 0.25s, background 0.25s;
 }
 .leitner-box.current { border-color: var(--teal); background: var(--teal-soft); transform: translateY(-4px); box-shadow: var(--shadow); }
-.leitner-box .small { font-size: 0.68rem; line-height: 1.2; }
+.leitner-box .small { font-size: 0.75rem; line-height: 1.2; }
 .leitner-count { font-weight: 700; color: var(--navy); }
 
 .calibration .calib-list { list-style: none; padding: 0; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.5rem; }

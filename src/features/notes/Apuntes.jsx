@@ -29,7 +29,12 @@ export default function Apuntes() {
   const { user } = useAuth();
   const { classNotes, notes, subjects, subjectMap } = useData();
   const [shared, setShared] = useState([]);
-  useEffect(() => watchSharedNotes(user.email, setShared, () => setShared([])), [user.email]);
+  const [sharedError, setSharedError] = useState('');
+  useEffect(() => watchSharedNotes(user.email, (list) => { setShared(list); setSharedError(''); }, (e) => {
+    console.error('Apuntes compartidos:', e);
+    setShared([]);
+    setSharedError(e?.code === 'permission-denied' ? 'permisos' : e?.code === 'failed-precondition' ? 'índice' : 'conexión');
+  }), [user.email]);
   const [filter, setFilter] = useState('all');
   const [q, setQ] = useState('');
   const [subject, setSubject] = useState('');
@@ -69,6 +74,12 @@ export default function Apuntes() {
           <AddSubjectButton><Plus size={16} aria-hidden="true" /> Agregar materia</AddSubjectButton>
         </span>
       </header>
+
+      {sharedError && (
+        <p className="error" role="alert">
+          No pudimos cargar «Compartidos conmigo» ({sharedError}). Si te compartieron un apunte y no lo ves, avisa a quien administra Amati.
+        </p>
+      )}
 
       <section className="stack-sm" aria-label="Crear un apunte" data-tour="notes-create">
         <p className="small muted">Crear un apunte. Pasa el puntero sobre una técnica para ver de qué trata:</p>

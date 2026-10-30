@@ -6,10 +6,12 @@ import { deleteNote } from '../../core/data/db.js';
 import { fmtShort } from '../../core/lib/dates.js';
 import { NOTE_TYPES, TECHNIQUE_MAP } from '../techniques/techniques.js';
 import TechniqueIcon from '../techniques/TechniqueIcon.jsx';
+import { useConfirm } from '../../core/components/ConfirmDialog.jsx';
 
 // Lista de apuntes. Si recibe subjectId, muestra solo los de esa materia (se usa dentro de la materia).
 export function NotesList({ subjectId = '', compact = false }) {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const { notes, subjectMap } = useData();
   const [type, setType] = useState('');
   const list = notes
@@ -17,7 +19,7 @@ export function NotesList({ subjectId = '', compact = false }) {
     .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
   async function remove(n) {
-    if (confirm(`¿Eliminar el apunte "${n.title}"?`)) await deleteNote(user.uid, n.id);
+    if (await confirm({ title: `¿Eliminar el apunte "${n.title}"?`, message: 'Esta acción no se puede deshacer.', confirmLabel: 'Eliminar', danger: true })) await deleteNote(user.uid, n.id);
   }
 
   return (

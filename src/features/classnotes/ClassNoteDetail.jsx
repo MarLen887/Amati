@@ -13,6 +13,8 @@ import { has } from './api/integrations.js';
 import { fetchStoredBlob } from './api/pipeline.js';
 import PdfPanel from '../pdf/PdfPanel.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
+import BackLink from '../../core/components/BackLink.jsx';
+import { useConfirm } from '../../core/components/ConfirmDialog.jsx';
 
 function Viewer({ file }) {
   if (!file) return null;
@@ -38,6 +40,7 @@ function Viewer({ file }) {
 
 function Detail({ note }) {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const { subjects, subjectMap } = useData();
   const nav = useNavigate();
   const location = useLocation();
@@ -111,7 +114,7 @@ function Detail({ note }) {
 
   async function remove() {
     const drive = file?.provider === 'drive';
-    if (!confirm(`¿Eliminar "${note.title}"?${drive ? ' También se borrará el PDF de tu Google Drive.' : ''}`)) return;
+    if (!(await confirm({ title: `¿Eliminar "${note.title}"?`, message: drive ? 'También se borrará el PDF de tu Google Drive.' : 'Esta acción no se puede deshacer.', confirmLabel: 'Eliminar', danger: true }))) return;
     setBusy('delete');
     try {
       if (drive) await deleteDriveFile(file.id).catch(() => {}); // si no hay permiso, el archivo queda en tu Drive
@@ -137,7 +140,7 @@ function Detail({ note }) {
   return (
     <div className="stack-lg">
       <div className="stack">
-        <Link to="/apuntes" className="small">← Apuntes</Link>
+        <BackLink to="/apuntes">Apuntes</BackLink>
         <input className="title-input" value={title} onChange={(e) => touch(setTitle)(e.target.value)} maxLength={200} aria-label="Título" />
         <p className="small muted">
           {note.classDate ? `Clase del ${fmtLong(note.classDate)}` : ''}

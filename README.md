@@ -24,6 +24,8 @@ Proyecto Integrador · Problemática Social Contemporánea · Equipo C · Grupo 
 13. [Herramientas de estudio](#13-herramientas-de-estudio)
 14. [Estructura del proyecto y datos](#14-estructura-del-proyecto-y-datos)
 15. [Tutorial y Centro de ayuda](#15-tutorial-y-centro-de-ayuda)
+16. [Icono en el celular (sin modo sin conexión)](#16-icono-en-el-celular-sin-modo-sin-conexión)
+17. [Colibrí compañero](#17-colibrí-compañero)
 
 ---
 
@@ -331,6 +333,8 @@ Al invitar a alguien en *Compartir*, Amati le manda un correo con el enlace al a
 
 Si no configuras EmailJS, compartir sigue funcionando: la persona ve el apunte en *Apuntes → Compartidos conmigo*.
 
+> **Para que «Compartidos conmigo» funcione hay que publicar las reglas y los índices:** `firebase deploy --only firestore:rules` y `firebase deploy --only firestore:indexes`. Las reglas incluyen una regla para consultas en todos los apuntes (`/{path=**}/notes/{id}`); sin ella Firestore rechaza la búsqueda y la persona invitada no ve nada, aunque el correo sí le llegue.
+
 ### 10.3 Alternativa con Cloud Functions (requiere plan Blaze)
 
 El proyecto también incluye `functions/index.js`, que envía los recordatorios desde Firebase. **Usa solo una opción**
@@ -459,7 +463,7 @@ las herramientas funcionan igual, sin la parte de IA.
 |---|---|---|
 | Corrector de ortografía y estilo | LanguageTool (API pública, ~20 revisiones/min; servidor propio con `VITE_LANGUAGETOOL_URL`) | no |
 | Traductor | MyMemory (gratuita, con límite diario; `VITE_MYMEMORY_EMAIL` lo amplía). Si defines `VITE_LIBRETRANSLATE_URL`, usa tu LibreTranslate | no |
-| Diccionario de inglés | Dictionary API + Wordnik (ejemplos y etimología) | `VITE_WORDNIK_API_KEY` (gratis); sin ella solo la parte básica |
+| Diccionario de inglés | Wiktionary (con Dictionary API de respaldo) + Wordnik (ejemplos y etimología) | `VITE_WORDNIK_API_KEY` (gratis); sin ella solo la parte básica |
 | Sinónimos | Datamuse (inglés); en español usa Gemini | no |
 
 **LibreTranslate:** las instancias públicas piden llave de pago, así que lo más simple es levantar la tuya (gratis):
@@ -545,3 +549,37 @@ admins/{correo}              administradores del panel de investigación
 | Preguntas frecuentes | `src/features/tutorial/faq.js` |
 
 Si cambias o mueves un botón señalado por el recorrido, conserva su atributo `data-tour`; si un objetivo no existe en pantalla, el paso se muestra al centro y el recorrido sigue funcionando.
+
+---
+
+## 16. Icono en el celular (sin modo sin conexión)
+
+Amati se puede **agregar a la pantalla de inicio** del celular con su icono y abrir a pantalla completa. Es la misma web, sin instalar nada.
+
+- **Android / Chrome:** menú ⋮ → «Añadir a pantalla de inicio» (o «Instalar app»).
+- **iPhone (Safari):** Compartir → «Añadir a pantalla de inicio».
+
+**Modo sin conexión: se probó y se quitó.** El *service worker* que guardaba archivos para abrir sin internet dejó
+versiones viejas en algunos dispositivos y provocó «Algo no salió como esperábamos» al abrir Progreso, Herramientas, Apuntes y Perfil.
+Para no arriesgar la presentación, Amati vuelve a necesitar internet, como antes.
+
+| Pieza | Archivo |
+|---|---|
+| Datos de la app (nombre, colores, iconos) | `public/manifest.webmanifest` |
+| Service worker de **limpieza**: lo reciben los dispositivos que tenían el anterior; borra sus archivos guardados, se desinstala y recarga una vez. **No debe borrarse todavía** | `public/sw.js` |
+| Limpieza adicional al abrir la app | `src/core/lib/pwa.js` |
+| Recarga automática si una pantalla pide un archivo de una versión anterior | `src/core/lib/chunkReload.js` |
+
+- Cuando pase tiempo suficiente (semanas) y todos los dispositivos hayan abierto Amati, `public/sw.js` ya no hace falta.
+- **Si aparece «Algo no salió como esperábamos»** en una pantalla: pulsa «Recargar». Si persiste, borra los datos del sitio en el navegador o abre Amati en una ventana de incógnito.
+
+---
+
+## 17. Colibrí compañero
+
+Un colibrí pequeño cruza la pantalla de un lado al otro cada ~20 s (con un poco de variación) y, en cada cruce, sube un poco; al llegar arriba empieza a bajar igual, poco a poco. Al posarse mira hacia adentro. Es decorativo: no recibe clics ni toques.
+
+- **No aparece** mientras estudias o escribes: en el repaso de tarjetas, el Pomodoro (y mientras su indicador está visible), el editor de apuntes, las notas de clase, las herramientas abiertas, el visor de PDF y durante el recorrido guiado.
+- **Se puede apagar** en Perfil → Apariencia (se guarda en ese dispositivo).
+- Con «reducir movimiento» activado en el sistema se queda quieto en la esquina.
+- Código: `src/core/components/FlyingBird.jsx` (tiempos y pantallas ocultas), `src/core/lib/birdPref.js` (preferencia) y `src/styles/bird.css`. No usa librerías.

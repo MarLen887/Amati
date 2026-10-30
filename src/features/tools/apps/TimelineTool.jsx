@@ -4,6 +4,7 @@ import timelineSource from '@knight-lab/timelinejs/dist/js/timeline.js?raw';
 import '@knight-lab/timelinejs/dist/css/timeline.css';
 import { Download, Plus, Trash2, Upload } from 'lucide-react';
 import { download } from '../lib/theme.js';
+import { useConfirm } from '../../../core/components/ConfirmDialog.jsx';
 
 // Líneas de tiempo con TimelineJS: agrega eventos con fecha y se dibuja una línea de tiempo navegable.
 const KEY = 'amati-timeline-data';
@@ -55,6 +56,7 @@ function toTimelineData(title, events) {
 }
 
 export default function TimelineTool() {
+  const confirm = useConfirm();
   const initial = useMemo(load, []);
   const [title, setTitle] = useState(initial.title || '');
   const [events, setEvents] = useState(initial.events);
@@ -113,7 +115,7 @@ export default function TimelineTool() {
         </label>
         <div className="row gap wrap">
           <button type="button" className="btn small ghost" onClick={() => setEvents((es) => [...es, newEvent()])}><Plus size={14} aria-hidden="true" /> Agregar evento</button>
-          <button type="button" className="btn small ghost" onClick={() => { if (confirm('Se reemplazará lo actual con un ejemplo. ¿Continuar?')) { setTitle(SAMPLE.title); setEvents(SAMPLE.events); } }}>Ver ejemplo</button>
+          <button type="button" className="btn small ghost" onClick={async () => { if (await confirm({ title: '¿Reemplazar con un ejemplo?', message: 'Se perderá la línea de tiempo actual.', confirmLabel: 'Reemplazar', danger: true })) { setTitle(SAMPLE.title); setEvents(SAMPLE.events); } }}>Ver ejemplo</button>
           <span className="grow" />
           <button type="button" className="btn small ghost" onClick={() => download('linea-de-tiempo.json', JSON.stringify({ title, events }, null, 2), 'application/json')}>
             <Download size={14} aria-hidden="true" /> Guardar archivo

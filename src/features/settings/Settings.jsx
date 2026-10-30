@@ -7,6 +7,7 @@ import PomodoroSettings from './PomodoroSettings.jsx';
 import MyData from './MyData.jsx';
 import HelpCenter from '../tutorial/HelpCenter.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
+import { setBirdEnabled, useBirdEnabled } from '../../core/lib/birdPref.js';
 
 const HOURS = Array.from({ length: 17 }, (_, i) => i + 6); // 6:00 a 22:00
 
@@ -16,6 +17,7 @@ export default function Settings() {
   const [reminders, setReminders] = useState(null);
   const [saved, setSaved] = useState('');
   const [error, setError] = useState('');
+  const birdOn = useBirdEnabled();
 
   useEffect(() => {
     if (profile) {
@@ -86,6 +88,15 @@ export default function Settings() {
       </form>
 
       <PomodoroSettings />
+
+      <section className="panel stack">
+        <h2 className="h3">Apariencia</h2>
+        <label className="checkbox">
+          <input type="checkbox" checked={birdOn} onChange={(e) => setBirdEnabled(e.target.checked)} />
+          Mostrar el colibrí que se mueve por la pantalla (solo en este dispositivo)
+        </label>
+        <p className="small muted">No aparece mientras estudias, escribes o usas una herramienta.</p>
+      </section>
 
       <HelpCenter />
 

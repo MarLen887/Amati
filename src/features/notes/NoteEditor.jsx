@@ -13,6 +13,8 @@ import OutlineEditor from './OutlineEditor.jsx';
 import CornellEditor from './CornellEditor.jsx';
 import GenerateResources, { plainNote } from './GenerateResources.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
+import BackLink from '../../core/components/BackLink.jsx';
+import { useConfirm } from '../../core/components/ConfirmDialog.jsx';
 // El editor completo (TipTap, Yjs, KaTeX, Excalidraw) es pesado: se descarga solo al abrir un apunte libre
 const RichNoteLazy = lazy(() => import('./rich/RichNote.jsx'));
 const RichNote = (props) => <Suspense fallback={<p className="muted">Abriendo editor…</p>}><RichNoteLazy {...props} /></Suspense>;
@@ -22,6 +24,7 @@ const emptyContent = (type, source = '') =>
 
 function NoteForm({ initial, type }) {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const nav = useNavigate();
   const [params] = useSearchParams();
   const tech = TECHNIQUE_MAP[NOTE_TYPES[type].technique];
@@ -68,7 +71,7 @@ function NoteForm({ initial, type }) {
   }
 
   async function remove() {
-    if (!id || !confirm('¿Eliminar este apunte? Esta acción no se puede deshacer.')) return;
+    if (!id || !(await confirm({ title: '¿Eliminar este apunte?', message: 'Esta acción no se puede deshacer.', confirmLabel: 'Eliminar', danger: true }))) return;
     await deleteNote(user.uid, id);
     setDirty(false);
     nav(subjectId ? `/materias/${subjectId}` : '/apuntes');
@@ -77,7 +80,7 @@ function NoteForm({ initial, type }) {
   const pairs = type === 'cornell' ? (content.rows || []).filter((r) => r.cue.trim() && r.note.trim()) : [];
   async function toCards() {
     if (!subjectId) { setError('Elige una materia para crear las tarjetas.'); return; }
-    if (!confirm(`¿Crear ${pairs.length} ${pairs.length === 1 ? 'tarjeta' : 'tarjetas'} con las pistas (pregunta) y notas (respuesta)?`)) return;
+    if (!(await confirm({ title: `¿Crear ${pairs.length} ${pairs.length === 1 ? 'tarjeta' : 'tarjetas'}?`, message: 'Las pistas serán la pregunta y las notas la respuesta.', confirmLabel: 'Crear' }))) return;
     setBusy(true);
     try {
       const n = await createCardsBulk(user.uid, subjectId, pairs.map((r) => ({ front: r.cue, back: r.note, topic })));
@@ -94,7 +97,7 @@ function NoteForm({ initial, type }) {
   return (
     <div className="stack-lg">
       <div>
-        <Link to={subjectId ? `/materias/${subjectId}` : '/apuntes'} className="small">← Volver</Link>
+        <BackLink to={subjectId ? `/materias/${subjectId}` : '/apuntes'}>Volver</BackLink>
         <h1 className="row gap"><span className="technique-icon"><TechniqueIcon name={tech.icon} /></span> {tech.name}</h1>
         <p className="muted">{tech.short}</p>
       </div>

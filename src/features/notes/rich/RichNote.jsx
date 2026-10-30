@@ -25,6 +25,8 @@ import SharePanel from './SharePanel.jsx';
 import HistoryPanel from './HistoryPanel.jsx';
 import SubjectSelect from '../../subjects/SubjectSelect.jsx';
 import GenerateResources from '../GenerateResources.jsx';
+import BackLink from '../../../core/components/BackLink.jsx';
+import { useConfirm } from '../../../core/components/ConfirmDialog.jsx';
 
 const lowlight = createLowlight(common);
 const SAVE_DELAY = 1500;
@@ -70,7 +72,7 @@ export default function RichNote({ ownerUid, noteId }) {
 
   return (
     <div className="stack-lg rich-page">
-      <Link to="/apuntes" className="small">← Volver a mis apuntes</Link>
+      <BackLink to="/apuntes">Volver a mis apuntes</BackLink>
       {collab ? (
         <Shell key={collab.ydoc.guid} {...{ note, noteId, ownerUid, isOwner, collab, synced, sync, error, setError, nav, live, user }} />
       ) : <p className="muted">Abriendo apunte…</p>}
@@ -80,6 +82,7 @@ export default function RichNote({ ownerUid, noteId }) {
 
 function Shell({ note, noteId, ownerUid, isOwner, collab, synced, sync, error, setError, nav, live, user }) {
   const { ydoc, provider } = collab;
+  const confirm = useConfirm();
   const [title, setTitle] = useState(note.title);
   const [panel, setPanel] = useState(null); // 'share' | 'history'
   const [math, setMath] = useState(null); // { block, latex, pos? }
@@ -155,7 +158,7 @@ function Shell({ note, noteId, ownerUid, isOwner, collab, synced, sync, error, s
   }, [editor, synced]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function remove() {
-    if (!confirm('¿Eliminar este apunte para siempre? Se borrará también su historial.')) return;
+    if (!(await confirm({ title: '¿Eliminar este apunte para siempre?', message: 'Se borrará también su historial.', confirmLabel: 'Eliminar', danger: true }))) return;
     clearTimeout(timer.current); timer.current = null;
     provider.destroy();
     await deleteNote(ownerUid, noteId);

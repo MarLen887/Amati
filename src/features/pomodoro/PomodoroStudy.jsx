@@ -13,6 +13,7 @@ import FlashcardView from '../techniques/cards/FlashcardView.jsx';
 import PomodoroRing from './PomodoroRing.jsx';
 import PomodoroBreak from './PomodoroBreak.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
+import { useConfirm } from '../../core/components/ConfirmDialog.jsx';
 
 const HIDE_KEY = 'amati-pomo-hide-time';
 
@@ -27,6 +28,7 @@ function readHide() {
 // Pomodoro suave: respiración -> [bloque de estudio -> descanso]* -> resumen
 export default function PomodoroStudy() {
   const { user, profile } = useAuth();
+  const confirm = useConfirm();
   const { cards, dueCards, subjectMap, loading } = useData();
   const pomo = usePomodoro();
   const { state, config, remainingMs, timeUp } = pomo;
@@ -161,8 +163,8 @@ export default function PomodoroStudy() {
     pomo.startBreak();
   }
 
-  function endNow() {
-    if (!confirm('¿Terminar el Pomodoro ahora? Tu avance ya está guardado.')) return;
+  async function endNow() {
+    if (!(await confirm({ title: '¿Terminar el Pomodoro ahora?', message: 'Tu avance ya está guardado.', confirmLabel: 'Terminar' }))) return;
     setCurrentId(null);
     pomo.end();
     setStep('closing');

@@ -5,12 +5,14 @@ import { useAuth } from '../../core/context/AuthContext.jsx';
 import { useData } from '../../core/context/DataContext.jsx';
 import { deleteLibro } from '../../core/data/db.js';
 import CopyrightNotice from './CopyrightNotice.jsx';
+import { useConfirm } from '../../core/components/ConfirmDialog.jsx';
 
 const SOURCE_TAG = { OpenLibrary: 'Open Library', InternetArchive: 'Internet Archive', Gutenberg: 'Gutenberg', GoogleBooks: 'Google Books', Usuario: 'Mi PDF' };
 
 // Libros guardados (de las APIs) y PDFs propios. Con subjectId muestra solo los de esa materia.
 export default function LibroList({ subjectId = '', showFilters = true }) {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const { libros, subjects } = useData();
   const [q, setQ] = useState('');
   const [subject, setSubject] = useState(subjectId);
@@ -70,7 +72,7 @@ export default function LibroList({ subjectId = '', showFilters = true }) {
                   </a>
                 )}
                 <Link className="btn small ghost" to={`/apuntes/nuevo?${new URLSearchParams({ tipo: 'pq4r', fuente: l.title, ...(l.subjectId ? { materia: l.subjectId } : {}) })}`} >PQ4R</Link>
-                <button className="btn small ghost danger" onClick={() => confirm(`¿Quitar «${l.title}» de tu biblioteca?`) && deleteLibro(user.uid, l.id)}>Quitar</button>
+                <button className="btn small ghost danger" onClick={async () => { if (await confirm({ title: `¿Quitar «${l.title}» de tu biblioteca?`, confirmLabel: 'Quitar', danger: true })) deleteLibro(user.uid, l.id); }}>Quitar</button>
               </div>
             </li>
           ))}

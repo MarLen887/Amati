@@ -8,6 +8,7 @@ import { makeCards, summarize } from '../classnotes/api/gemini.js';
 import { has } from '../classnotes/api/integrations.js';
 import PdfPanel from './PdfPanel.jsx';
 import QuizPanel from '../notes/QuizPanel.jsx';
+import BackLink from '../../core/components/BackLink.jsx';
 
 // Lector de un PDF propio de la biblioteca: anotar, extraer texto (OCR) y pasarlo por la IA.
 export default function PdfBook() {
@@ -33,7 +34,7 @@ export default function PdfBook() {
   return (
     <div className="stack-lg">
       <div>
-        <Link to="/biblioteca" className="small">← Biblioteca</Link>
+        <BackLink to="/biblioteca">Biblioteca</BackLink>
         <h1>{libro.title}</h1>
         <p className="muted small">{[libro.author, subjectMap[libro.subjectId]?.name].filter(Boolean).join(' · ')}</p>
       </div>

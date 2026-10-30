@@ -3,7 +3,7 @@ import { ExternalLink, Languages, Search, Volume2 } from 'lucide-react';
 import { translate } from '../lib/translate.js';
 import { canSpeak, speak } from '../lib/speak.js';
 
-// Diccionario de inglés. Información básica: Dictionary API (gratuita, sin llave).
+// Diccionario de inglés. Información básica: Wiktionary (gratuita, sin llave), con Dictionary API de respaldo.
 // Información avanzada (ejemplos reales, etimología, frecuencia): Wordnik, con llave gratuita VITE_WORDNIK_API_KEY
 // (https://developer.wordnik.com). Con la llave en el navegador, protégela por dominio y no la uses con datos privados.
 const DICT = 'https://api.dictionaryapi.dev/api/v2/entries/en';
@@ -12,17 +12,56 @@ const WK = import.meta.env.VITE_WORDNIK_API_KEY || '';
 const EXAMPLES = ['implement', 'ubiquitous', 'resilient', 'scope', 'leverage', 'ambiguous'];
 const POS = { noun: 'sustantivo', verb: 'verbo', adjective: 'adjetivo', adverb: 'adverbio', pronoun: 'pronombre', preposition: 'preposición', conjunction: 'conjunción', interjection: 'interjección', exclamation: 'exclamación' };
 
-// El servicio gratuito del diccionario a veces tarda o no responde: se espera poco y se reintenta una vez
-async function fetchDict(word) {
-  let lastErr;
-  for (let i = 0; i < 2; i++) {
+// Fuentes gratuitas y sin llave. Wiktionary es la principal (estable y con CORS abierto); Dictionary API es el respaldo,
+// porque ese servicio a veces se cae por días. Las dos se convierten al mismo formato: [{ word, phonetics, meanings, sourceUrls }].
+const WIKT = 'https://en.wiktionary.org/api/rest_v1/page/definition';
+const plain = (html) => {
+  const d = new DOMParser().parseFromString(String(html || ''), 'text/html');
+  return (d.body.textContent || '').replace(/\s+/g, ' ').trim();
+};
+
+// Devuelve las entradas, null si la palabra no existe, o lanza error si no hay conexión
+async function fromWiktionary(word) {
+  const res = await fetch(`${WIKT}/${encodeURIComponent(word)}`, { signal: AbortSignal.timeout(9000) });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Wiktionary respondió ${res.status}`);
+  const data = await res.json();
+  const meanings = (data.en || []).map((m) => ({
+    partOfSpeech: String(m.partOfSpeech || '').toLowerCase(),
+    definitions: (m.definitions || [])
+      .map((d) => ({ definition: plain(d.definition), example: plain((d.examples || [])[0]) }))
+      .filter((d) => d.definition),
+    synonyms: [],
+    antonyms: [],
+  })).filter((m) => m.definitions.length);
+  if (!meanings.length) return null;
+  return [{ word, phonetics: [], meanings, sourceUrls: [`https://en.wiktionary.org/wiki/${encodeURIComponent(word)}#English`] }];
+}
+
+async function fromDictionaryApi(word) {
+  const res = await fetch(`${DICT}/${encodeURIComponent(word)}`, { signal: AbortSignal.timeout(6000) });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Dictionary API respondió ${res.status}`);
+  return res.json();
+}
+
+async function fetchEntries(word) {
+  let notFound = false;
+  let failed = false;
+  let timedOut = false;
+  for (const source of [fromWiktionary, fromDictionaryApi]) {
     try {
-      return await fetch(`${DICT}/${encodeURIComponent(word)}`, { signal: AbortSignal.timeout(8000) });
+      const entries = await source(word);
+      if (entries?.length) return entries;
+      notFound = true;
     } catch (e) {
-      lastErr = e;
+      failed = true;
+      if (e?.name === 'TimeoutError') timedOut = true;
     }
   }
-  throw new Error(lastErr?.name === 'TimeoutError' ? 'El diccionario tardó demasiado en responder. Inténtalo de nuevo en un momento.' : 'No se pudo conectar con el diccionario. Revisa tu conexión.');
+  if (notFound) throw new Error(`No encontré «${word}». Revisa la ortografía (este diccionario es de inglés) o prueba con la forma base de la palabra.`);
+  if (failed && timedOut) throw new Error('El diccionario tardó demasiado en responder. Inténtalo de nuevo en un momento.');
+  throw new Error('No se pudo conectar con el diccionario. Revisa tu conexión.');
 }
 
 async function wk(word, path, params = {}) {
@@ -63,10 +102,7 @@ export default function Dictionary() {
     if (!w) return;
     setQ(w); setWord(w); setBusy(true); setError(''); setEntries(null); setAdv(null); setAdvErr(''); setTr({});
     try {
-      const res = await fetchDict(w);
-      if (res.status === 404) throw new Error(`No encontré «${w}». Revisa la ortografía (este diccionario es de inglés) o prueba con la forma base de la palabra.`);
-      if (!res.ok) throw new Error(`El diccionario respondió ${res.status}.`);
-      setEntries(await res.json());
+      setEntries(await fetchEntries(w));
       setHist((h) => [w, ...h.filter((x) => x !== w)].slice(0, 12));
       translateText(w);
       if (WK) loadAdvanced(w);
@@ -143,12 +179,10 @@ export default function Dictionary() {
         </section>
       )}
 
-      {first && (
+      {first && WK && (
         <section className="panel stack" aria-label="Información avanzada">
           <h2 className="h3">Más a fondo <span className="tag">Wordnik</span></h2>
-          {!WK ? (
-            <p className="small muted">Para ver ejemplos reales, etimología y frecuencia de uso, agrega tu llave gratuita de Wordnik en <code>VITE_WORDNIK_API_KEY</code> (se pide en developer.wordnik.com).</p>
-          ) : advErr ? <p className="error" role="alert">{advErr}</p> : !adv ? <p className="muted small">Consultando Wordnik…</p> : (
+          {advErr ? <p className="error" role="alert">{advErr}</p> : !adv ? <p className="muted small">Consultando Wordnik…</p> : (
             <>
               {adv.examples.length > 0 && (
                 <div className="stack-sm"><strong className="small">Ejemplos reales</strong>
@@ -167,7 +201,7 @@ export default function Dictionary() {
           )}
         </section>
       )}
-      <p className="small muted">Definiciones: Dictionary API (Wiktionary). Traducción al español automática: revísala con criterio.</p>
+      <p className="small muted">Definiciones: Wiktionary. Traducción al español automática: revísala con criterio.</p>
     </div>
   );
 }

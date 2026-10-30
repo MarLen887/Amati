@@ -44,7 +44,7 @@ h3, .h3 { font-size: var(--fs-h3); }
 
 /* ---------- Navegación ---------- */
 .bottom-nav { grid-template-columns: repeat(7, minmax(0, 1fr)); }
-.bottom-link { font-size: 0.7rem; min-width: 0; }
+.bottom-link { font-size: 0.72rem; min-width: 0; }
 .bottom-link span:not(.badge) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-inline: 2px; }
 .badge { background: var(--pending); color: var(--on-accent, #fff); }
 @media (max-width: 400px) { .logo-text { display: none; } }
@@ -159,4 +159,4 @@ h3, .h3 { font-size: var(--fs-h3); }
 .continue-row .grow { flex: 1 1 9rem; min-width: 0; }
 .next-exam .grow { min-width: 0; }
 .metric.time .metric-value { font-size: 1.7rem; }
-@media (max-width: 360px) { .bottom-link { font-size: 0.62rem; } .bottom-link span:not(.badge) { padding-inline: 0; letter-spacing: -0.01em; } .btn.xl { font-size: 1.05rem; padding-inline: 1rem; } }
+@media (max-width: 360px) { .bottom-link { font-size: 0.68rem; } .bottom-link span:not(.badge) { padding-inline: 0; letter-spacing: -0.01em; } .btn.xl { font-size: 1.05rem; padding-inline: 1rem; } }

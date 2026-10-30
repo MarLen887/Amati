@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { preloadTool } from './toolLoaders.js';
 import {
   Apple, ArrowLeftRight, MapPin, Sheet, ChartPie, BookOpenText, Shuffle, Database, GitBranch, LifeBuoy, Terminal, Atom, BookSearch, Bone, Briefcase, CalendarCheck, Calculator, ChartColumn, ChartLine, CircuitBoard,
   ClipboardList, Code, Cpu, Dna, FlaskConical, Globe, History, Landmark, Languages, LayoutDashboard, Music, Network, Palette,
@@ -36,7 +37,7 @@ function FavButton({ tool, fav, onFav }) {
 
 const Open = ({ tool, children, className }) =>
   tool.status === 'ready' && tool.to
-    ? <Link to={tool.to} className={className}>{children}</Link>
+    ? <Link to={tool.to} className={className} onPointerEnter={() => preloadTool(tool.id)} onFocus={() => preloadTool(tool.id)}>{children}</Link>
     : <div className={`${className} is-soon`}>{children}</div>;
 
 // Tarjeta: icono, nombre, descripción corta y a quién sirve

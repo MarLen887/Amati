@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authErrorMessage, useAuth } from '../../core/context/AuthContext.jsx';
 import { ALLOWED_DOMAIN } from '../../core/firebase.js';
@@ -29,6 +29,8 @@ export function Login() {
   const nav = useNavigate();
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => { document.title = 'Iniciar sesión · Amati'; }, []);
 
   async function start() {
     setBusy(true);

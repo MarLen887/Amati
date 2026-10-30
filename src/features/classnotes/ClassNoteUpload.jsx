@@ -7,6 +7,7 @@ import { saveClassNote } from '../../core/data/db.js';
 import { ACCEPT, has } from './api/integrations.js';
 import { preloadGoogleIdentity } from './api/drive.js';
 import { describeProvider, isImage, processUpload } from './api/pipeline.js';
+import BackLink from '../../core/components/BackLink.jsx';
 
 const toInput = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const fromInput = (v) => {
@@ -108,7 +109,7 @@ export default function ClassNoteUpload() {
   return (
     <div className="stack-lg narrow-wide">
       <div>
-        <Link to="/apuntes" className="small">← Apuntes</Link>
+        <BackLink to="/apuntes">Apuntes</BackLink>
         <h1>Subir apuntes</h1>
       </div>
 

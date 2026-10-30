@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { History as HistoryIcon, RotateCcw } from 'lucide-react';
 import { watchVersions } from '../../../core/data/db.js';
 import { fmtShort } from '../../../core/lib/dates.js';
+import { useConfirm } from '../../../core/components/ConfirmDialog.jsx';
 
 // Historial: versiones automáticas (cada ~5 min de edición) y las que guardes a mano.
 export default function HistoryPanel({ ownerUid, noteId, onSaveNow, onRestore }) {
+  const confirm = useConfirm();
   const [versions, setVersions] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -12,7 +14,7 @@ export default function HistoryPanel({ ownerUid, noteId, onSaveNow, onRestore })
   useEffect(() => watchVersions(ownerUid, noteId, setVersions, () => setVersions([])), [ownerUid, noteId]);
 
   async function restore(v) {
-    if (!confirm('¿Restaurar esta versión? Tu contenido actual se guarda antes en el historial.')) return;
+    if (!(await confirm({ title: '¿Restaurar esta versión?', message: 'Tu contenido actual se guarda antes en el historial.', confirmLabel: 'Restaurar' }))) return;
     setBusy(true); setError('');
     try { await onRestore(v); } catch (e) { setError('No se pudo restaurar. ' + e.message); } finally { setBusy(false); }
   }

@@ -5,6 +5,7 @@ import {
 import '@xyflow/react/dist/style.css';
 import { Download, Plus, Trash2, Upload } from 'lucide-react';
 import { download, isDark } from '../lib/theme.js';
+import { useConfirm } from '../../../core/components/ConfirmDialog.jsx';
 
 // Diagramas interactivos con React Flow: algoritmos, redes y arquitecturas. Arrastra, conecta y edita.
 const KEY = 'amati-flow-diagram';
@@ -49,6 +50,7 @@ function load() {
 }
 
 function Editor() {
+  const confirm = useConfirm();
   const initial = useMemo(load, []);
   const [nodes, setNodes] = useState(initial.nodes);
   const [edges, setEdges] = useState(initial.edges);
@@ -83,8 +85,8 @@ function Editor() {
     setEdges((es) => es.filter((e) => !e.selected && !nodes.some((n) => n.selected && (n.id === e.source || n.id === e.target))));
   }
 
-  function applyTemplate(t) {
-    if ((nodes.length || edges.length) && !confirm('Se reemplazará el diagrama actual. ¿Continuar?')) return;
+  async function applyTemplate(t) {
+    if ((nodes.length || edges.length) && !(await confirm({ title: '¿Reemplazar el diagrama actual?', message: 'Se perderá lo que tienes en el lienzo.', confirmLabel: 'Reemplazar', danger: true }))) return;
     setNodes(t.nodes);
     setEdges(t.edges);
     setTimeout(() => fitView({ padding: 0.2 }), 50);

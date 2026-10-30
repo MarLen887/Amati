@@ -18,3 +18,24 @@
 
 .error-box { max-width: 30rem; margin: 3rem auto; text-align: center; justify-items: center; }
 .error-box > svg { color: var(--pending, #d9a441); }
+
+/* Aviso sin conexión */
+.offline-banner { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.45rem 1rem; background: #121a2e; color: #fff; font-size: 0.85rem; font-weight: 600; text-align: center; }
+
+/* Celulares: áreas táctiles de al menos 44 px (estrella de favoritas, pestañas de vista, botones de ícono) */
+@media (pointer: coarse) {
+  .fav-btn { min-width: 44px; min-height: 44px; top: 0.3rem; right: 0.3rem; }
+  .view-switch button { min-height: 44px; }
+  .icon-btn { min-width: 44px; min-height: 44px; }
+  .chip, .btn.small { min-height: 44px; }
+}
+
+/* Diálogo de confirmación propio (reemplaza window.confirm) */
+.confirm-backdrop { z-index: 90; }
+.confirm-card { width: min(26rem, 100%); }
+.confirm-icon { display: inline-grid; place-items: center; color: var(--danger); }
+.confirm-actions { justify-content: flex-end; flex-wrap: wrap; }
+@media (max-width: 480px) {
+  .confirm-actions { flex-direction: column-reverse; align-items: stretch; }
+  .confirm-actions .btn { width: 100%; justify-content: center; }
+}

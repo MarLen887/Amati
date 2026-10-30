@@ -56,6 +56,8 @@
 .btn.rate:hover:not(:disabled) { transform: translateY(-3px); }
 .btn.rate:active:not(:disabled) { transform: scale(0.95); }
 .btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+/* Foco visible para teclado en todo lo interactivo (especificidad 0: cualquier regla propia lo sustituye) */
+:where(a[href], button, summary, [role="button"], [role="tab"], [role="menuitem"], [tabindex]:not([tabindex="-1"])):focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 .icon-btn {
   border: 0; background: transparent; color: var(--muted); cursor: pointer;
   display: grid; place-items: center; padding: 0.4rem; border-radius: 8px;
@@ -101,7 +103,7 @@
 .chart .recharts-cartesian-axis-tick-value { fill: var(--muted); }
 .chart .recharts-surface { overflow: visible; }
 .direct-label { font-size: 12px; font-weight: 600; fill: var(--text); }
-.bar-label { font-size: 11px; fill: var(--muted); }
+.bar-label { font-size: 12px; fill: var(--muted); }
 .progress-grid { align-items: stretch; }
 
 .legend { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; font-size: 0.85rem; color: var(--muted); }
@@ -140,7 +142,7 @@
 /* Calendario de actividad */
 .heatmap-wrap { display: flex; flex-direction: column; gap: 0.6rem; }
 .heatmap { display: flex; gap: 4px; }
-.heatmap-days { display: grid; grid-template-rows: repeat(7, 1fr); gap: 4px; font-size: 10px; color: var(--muted); margin-right: 2px; }
+.heatmap-days { display: grid; grid-template-rows: repeat(7, 1fr); gap: 4px; font-size: 11px; color: var(--muted); margin-right: 2px; }
 .heatmap-days span { line-height: 1; display: flex; align-items: center; height: 100%; }
 .heatmap-col { display: grid; grid-template-rows: repeat(7, 1fr); gap: 4px; flex: 1; }
 .heat-cell {
@@ -167,3 +169,22 @@
 @media (prefers-reduced-motion: reduce) {
   .ripple, .btn.primary::after { display: none; }
 }
+
+/* Botón «Volver» (BackLink): minimalista; flecha que se desliza, subrayado que se dibuja y hover en el verde azulado del logo */
+.back-link { display: inline-flex; align-items: center; gap: 0.4rem; width: fit-content; min-height: 36px; margin-bottom: 0.4rem; padding: 0.3rem 0.1rem; color: var(--navy); font-weight: 650; font-size: 0.93rem; letter-spacing: 0.005em; text-decoration: none; transition: color 0.25s ease, transform 0.25s ease; animation: back-in 0.4s ease both; }
+.back-link-icon { display: inline-grid; place-items: center; transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+.back-link-text {
+  padding-bottom: 2px;
+  background:
+    linear-gradient(var(--teal), var(--teal)) left bottom / 0% 2px no-repeat,
+    linear-gradient(color-mix(in srgb, currentColor 30%, transparent), color-mix(in srgb, currentColor 30%, transparent)) left bottom / 100% 1px no-repeat;
+  transition: background-size 0.35s ease;
+}
+.back-link:hover, .back-link:focus-visible { color: color-mix(in srgb, var(--teal) 82%, var(--text)); text-decoration: none; }
+.back-link:hover .back-link-icon, .back-link:focus-visible .back-link-icon { transform: translateX(-5px); }
+.back-link:hover .back-link-text, .back-link:focus-visible .back-link-text { background-size: 100% 2px, 100% 1px; }
+.back-link:focus-visible { outline: 2px solid color-mix(in srgb, var(--teal) 70%, transparent); outline-offset: 3px; border-radius: 6px; }
+.back-link:active .back-link-icon { transform: translateX(-2px) scale(0.92); }
+@keyframes back-in { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+@media (pointer: coarse) { .back-link { min-height: 40px; } }
+@media (prefers-reduced-motion: reduce) { .back-link, .back-link-icon, .back-link-text { animation: none; transition: none; } .back-link:hover .back-link-icon { transform: none; } }

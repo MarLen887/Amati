@@ -14,6 +14,7 @@ import Celebrate from '../../../core/components/Celebrate.jsx';
 import { interleave, matchesSelection, SESSION_SIZE, studyUrl } from './studyFilter.js';
 import { CARD_TECHNIQUES, saveLastTechnique, TECHNIQUE_MAP } from '../techniques.js';
 import Skeleton from '../../../core/components/Skeleton.jsx';
+import { useConfirm } from '../../../core/components/ConfirmDialog.jsx';
 
 export function shuffle(arr) {
   const a = [...arr];
@@ -35,6 +36,7 @@ const changeUrl = (subjectId, topic) => {
 // Flujo: respiración (opcional) -> tarjetas -> resumen
 export default function Study() {
   const { user, profile } = useAuth();
+  const confirm = useConfirm();
   const { cards, dueCards, subjectMap, loading } = useData();
   const [params] = useSearchParams();
   const subjectId = params.get('materia');
@@ -178,7 +180,7 @@ export default function Study() {
       nav('/');
       return;
     }
-    if (confirm('¿Terminar la sesión ahora? Tu avance ya está guardado.')) setStep('closing');
+    confirm({ title: '¿Terminar la sesión ahora?', message: 'Tu avance ya está guardado.', confirmLabel: 'Terminar' }).then((ok) => ok && setStep('closing'));
   }
 
   if (step === 'breathing') {

@@ -1,0 +1,12 @@
+/* Colibrí compañero: posado en una esquina de abajo, vuela a la otra cada ~25 s. No recibe clics ni toques. */
+.flying-bird { position: fixed; bottom: calc(0.75rem + env(safe-area-inset-bottom)); z-index: 30; pointer-events: none; opacity: 1; transition: opacity 0.4s ease, visibility 0.4s; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.16)); will-change: transform; }
+.flying-bird.at-right { right: 14px; }
+.flying-bird.at-left { left: 14px; }
+.flying-bird.is-hidden { opacity: 0; visibility: hidden; }
+.flying-bird-face { transition: transform 0.35s ease; }
+.flying-bird-face.face-left { transform: scaleX(-1); } /* el dibujo mira a la derecha */
+.flying-bird-face.face-right { transform: scaleX(1); }
+/* Posado: aletea despacio; volando: aletea rápido (el aleteo base ya está en pomodoro.css) */
+.flying-bird.is-perched .hb-wing-back, .flying-bird.is-perched .hb-wing-front { animation-duration: 1.8s; }
+@media (max-width: 640px) { .flying-bird { bottom: calc(0.5rem + env(safe-area-inset-bottom)); } .flying-bird.at-right { right: 8px; } .flying-bird.at-left { left: 8px; } }
+@media print { .flying-bird { display: none; } }

@@ -153,6 +153,12 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // «Compartidos conmigo» busca en TODOS los apuntes (collection group): sin esta regla Firestore rechaza la consulta
+    // aunque la regla de users/{uid}/notes/{id} sí lo permita. Solo da lectura a quien está en collaboratorEmails.
+    match /{path=**}/notes/{id} {
+      allow read: if isCollabOf(resource.data);
+    }
+
     // Lista de administradores (doc id = correo en minúsculas). Se edita desde la consola.
     match /admins/{email} {
       allow read: if verified() && request.auth.token.email.lower() == email;
