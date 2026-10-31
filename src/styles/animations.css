@@ -113,10 +113,22 @@ select:disabled { opacity: 0.6; }
 .blob-c { width: 260px; height: 260px; background: var(--navy); top: 40%; left: 55%; opacity: 0.1; animation-duration: 34s; }
 :root[data-theme='dark'] .blob { opacity: 0.14; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .blob { opacity: 0.14; } }
-.particle { position: absolute; bottom: -30px; opacity: 0; animation: float-up linear infinite; }
+.particle { position: absolute; bottom: -40px; opacity: 0; will-change: transform, opacity; animation: float-up linear infinite; }
 .particle.card { border-radius: 3px; background: var(--surface); border: 1.5px solid var(--sand); }
-.particle.leaf { background: var(--teal); border-radius: 0 100% 0 100%; }
-.particle.dot { background: var(--coral); border-radius: 50%; }
+.particle.card::before, .particle.card::after { content: ''; position: absolute; left: 18%; right: 18%; height: 1.5px; border-radius: 2px; background: var(--sand); opacity: 0.8; }
+.particle.card::before { top: 32%; }
+.particle.card::after { top: 56%; right: 38%; }
+.particle.leaf { border-radius: 0 100% 0 100%; background: var(--teal); }
+.particle.leaf.sand { background: var(--sand); }
+.particle.leaf.coral { background: var(--coral); }
+.particle.leaf.navy { background: var(--navy); }
+.particle.dot { border-radius: 50%; background: var(--coral); }
+.particle.dot.teal { background: var(--teal); }
+.particle.dot.sand { background: var(--sand); }
+.particle.dot.navy { background: var(--navy); }
+.particle.far { z-index: 0; }
+.particle.near { z-index: 2; }
+@media (max-width: 640px) { .particle.extra { display: none; } }
 
 /* ---------- Transiciones de pantalla ---------- */
 .page-enter { animation: page-in 0.5s cubic-bezier(.2, .8, .3, 1); }
@@ -179,11 +191,11 @@ select:disabled { opacity: 0.6; }
   100% { transform: translate(-20px, 50px) scale(0.95); }
 }
 @keyframes float-up {
-  0% { transform: translateY(0) translateX(0) rotate(0); opacity: 0; }
-  10% { opacity: 0.5; }
-  50% { transform: translateY(-55vh) translateX(25px) rotate(120deg); }
-  90% { opacity: 0.4; }
-  100% { transform: translateY(-110vh) translateX(-15px) rotate(240deg); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) rotate(0); opacity: 0; }
+  8% { opacity: var(--o, 0.5); }
+  50% { transform: translate3d(var(--sway, 25px), -55vh, 0) rotate(var(--spin, 120deg)); }
+  92% { opacity: calc(var(--o, 0.5) * 0.8); }
+  100% { transform: translate3d(calc(var(--sway, 25px) * -0.6), -112vh, 0) rotate(calc(var(--spin, 120deg) * 2)); opacity: 0; }
 }
 @keyframes fall-down {
   0% { transform: translateY(0) translateX(0) rotate(0); opacity: 0; }
