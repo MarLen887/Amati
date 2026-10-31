@@ -39,3 +39,24 @@
   .confirm-actions { flex-direction: column-reverse; align-items: stretch; }
   .confirm-actions .btn { width: 100%; justify-content: center; }
 }
+
+/* Indicador de carga: brote que crece (componente Loader). Espera 0.3 s antes de mostrarse para no parpadear. */
+.sprout-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; color: var(--muted); text-align: center; opacity: 0; animation: sprout-in 0.35s ease 0.3s forwards; }
+.sprout-lg { min-height: 100vh; padding: 1rem; }
+.sprout-md { padding: 2.5rem 1rem; }
+.sprout-sm { flex-direction: row; justify-content: flex-start; gap: 0.5rem; padding: 0.4rem 0; font-size: 0.9rem; }
+.sprout-art { width: 7.5rem; height: auto; overflow: visible; }
+.sprout-lg .sprout-art { width: 9rem; }
+.sprout-sm .sprout-art { width: 2.2rem; }
+.sprout-stem { fill: none; stroke: var(--teal); stroke-width: 4; stroke-linecap: round; transform-box: view-box; transform-origin: 60px 70px; animation: sprout-grow 3s ease-out infinite; }
+.sprout-leaf { transform-box: view-box; animation: sprout-leaf 3s ease-out infinite; }
+.sprout-leaf-a { fill: var(--teal); transform-origin: 60px 52px; }
+.sprout-leaf-b { fill: var(--navy); transform-origin: 60px 44px; }
+.sprout-pot { fill: var(--coral-soft); stroke: var(--coral); stroke-width: 2; stroke-linejoin: round; }
+@keyframes sprout-in { to { opacity: 1; } }
+@keyframes sprout-grow { 0%, 10% { transform: scaleY(0); } 55%, 100% { transform: scaleY(1); } }
+@keyframes sprout-leaf { 0%, 45% { transform: scale(0); } 75%, 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .sprout-loader { animation: sprout-in 0.01s ease 0.3s forwards; }
+  .sprout-stem, .sprout-leaf { animation: none; transform: none; }
+}

@@ -7,6 +7,7 @@ import { fetchLastSubjectSession } from '../../core/data/db.js';
 import { fmtShort } from '../../core/lib/dates.js';
 import { NOTE_TYPES, TECHNIQUE_MAP, techniqueUrl } from '../techniques/techniques.js';
 import TechniqueIcon from '../techniques/TechniqueIcon.jsx';
+import Loader from '../../core/components/Loader.jsx';
 
 // Técnica de estudio que el alumno usó más recientemente en ESTA materia: la última sesión de estudio
 // (tarjetas, Pomodoro…) o el último apunte con una técnica, lo que haya ocurrido después.
@@ -34,7 +35,7 @@ export default function SubjectRecentTechnique({ subjectId, cardCount, cardsOpen
   return (
     <section className="panel stack-sm recent-technique" aria-label="Técnica usada recientemente en esta materia">
       {session === undefined && !lastNote ? (
-        <p className="muted small">Cargando…</p>
+        <Loader size="sm" />
       ) : tech ? (
         <div className="row gap wrap">
           <span className="technique-icon"><TechniqueIcon name={tech.icon} /></span>

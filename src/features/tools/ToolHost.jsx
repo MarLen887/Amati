@@ -1,10 +1,10 @@
 import { lazy, Suspense } from 'react';
-import { LoaderCircle } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { LOADERS } from './toolLoaders.js';
 import { TOOLS, AREA_MAP, CATEGORY_MAP } from './tools.js';
 import { AreaDots, ToolIcon } from './ToolCard.jsx';
 import BackLink from '../../core/components/BackLink.jsx';
+import Loader from '../../core/components/Loader.jsx';
 import '../../styles/tools.css';
 
 // Cada herramienta se descarga solo cuando se abre (ver toolLoaders.js).
@@ -27,7 +27,7 @@ export default function ToolHost() {
           <span className="small muted">{tool.areas.length === 5 ? 'Todas las áreas' : tool.areas.map((a) => AREA_MAP[a].short).join(' · ')}</span>
         </p>
       </div>
-      <Suspense fallback={<p className="muted row gap tool-loading" role="status"><LoaderCircle size={18} className="spin" aria-hidden="true" /> Cargando {tool.name}… la primera vez puede tardar un poco.</p>}>
+      <Suspense fallback={<Loader label={`Cargando ${tool.name}… la primera vez puede tardar un poco.`} />}>
         <App />
       </Suspense>
     </div>

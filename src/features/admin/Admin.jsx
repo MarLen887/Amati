@@ -4,6 +4,7 @@ import { downloadCsv, toCsv } from '../../core/lib/csv.js';
 import { dayKey } from '../../core/lib/dates.js';
 import AdminCharts from './AdminCharts.jsx';
 import EmptyState from '../../core/components/EmptyState.jsx';
+import Loader from '../../core/components/Loader.jsx';
 
 // Panel de investigación: datos anónimos de la prueba piloto (V de Gowin: registros y transformaciones)
 export default function Admin() {
@@ -53,7 +54,7 @@ export default function Admin() {
       </div>
     );
   }
-  if (!summary) return <p className="muted">Cargando datos de la prueba piloto…</p>;
+  if (!summary) return <Loader label="Cargando datos de la prueba piloto…" />;
 
   const fmt = (v, d = 2) => (v === null || v === undefined ? '—' : v.toFixed(d));
   const today = dayKey();

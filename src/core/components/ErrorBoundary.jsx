@@ -40,10 +40,6 @@ export default class ErrorBoundary extends Component {
             : <button type="button" className="btn primary" onClick={() => this.setState({ error: null })}>Intentar de nuevo</button>}
           <a className="btn ghost" href="/">Ir al inicio</a>
         </div>
-        <details className="small muted">
-          <summary>Detalles técnicos</summary>
-          <code>{String(error?.message || error).slice(0, 300)}</code>
-        </details>
       </div>
     );
   }

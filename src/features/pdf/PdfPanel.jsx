@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { BookOpen, CircleCheck, CircleAlert, Loader2, ScanSearch } from 'lucide-react';
 import { fetchStoredBlob } from '../classnotes/api/pipeline.js';
+import Loader from '../../core/components/Loader.jsx';
 
 // El lector, Tesseract y pdf.js pesan bastante: se descargan solo al abrir un PDF.
 const PdfReader = lazy(() => import('./PdfReader.jsx'));
@@ -104,7 +105,7 @@ export default function PdfPanel({ file, annotations: initial = [], onSaveAnnota
       {error && <p className="error" role="alert">{error}</p>}
 
       {blob && (
-        <Suspense fallback={<p className="muted">Abriendo lector…</p>}>
+        <Suspense fallback={<Loader label="Abriendo lector…" />}>
           <PdfReader blob={blob} annotations={annotations} onChange={change} />
         </Suspense>
       )}

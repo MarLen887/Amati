@@ -7,6 +7,7 @@ import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import '@react-pdf-viewer/highlight/lib/styles/index.css';
 import { Highlighter, Trash2 } from 'lucide-react';
+import Loader from '../../core/components/Loader.jsx';
 import '../../styles/pdf.css';
 
 const themeNow = () => {
@@ -78,7 +79,7 @@ export default function PdfReader({ blob, annotations = [], onChange, readOnly =
     <div className="pdf-reader">
       <div className="pdf-main">
         <Worker workerUrl={workerUrl}>
-          {url ? <Viewer fileUrl={url} theme={themeNow()} plugins={[layout, highlight]} /> : <p className="muted small">Abriendo PDF…</p>}
+          {url ? <Viewer fileUrl={url} theme={themeNow()} plugins={[layout, highlight]} /> : <Loader label="Abriendo PDF…" />}
         </Worker>
       </div>
       <aside className="pdf-notes" aria-label="Anotaciones">

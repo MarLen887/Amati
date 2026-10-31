@@ -23,6 +23,7 @@ import PomodoroStudy from '../features/pomodoro/PomodoroStudy.jsx';
 import { PomodoroProvider } from '../features/pomodoro/PomodoroContext.jsx';
 const Progress = lazy(() => import('../features/progress/Progress.jsx'));
 import Settings from '../features/settings/Settings.jsx';
+import Loader from '../core/components/Loader.jsx';
 const Admin = lazy(() => import('../features/admin/Admin.jsx'));
 
 // Redirige conservando los parámetros de la dirección (p. ej. /buscar?q=… -> /biblioteca?q=…)
@@ -32,7 +33,7 @@ function Redirect({ to }) {
 }
 
 function Loading() {
-  return <div className="center-screen muted">Cargando…</div>;
+  return <Loader size="lg" label="Algo está creciendo…" />;
 }
 
 // Solo usuarios con sesión (Google ya verifica el correo institucional)

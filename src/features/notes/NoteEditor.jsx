@@ -15,9 +15,10 @@ import GenerateResources, { plainNote } from './GenerateResources.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
 import BackLink from '../../core/components/BackLink.jsx';
 import { useConfirm } from '../../core/components/ConfirmDialog.jsx';
+import Loader from '../../core/components/Loader.jsx';
 // El editor completo (TipTap, Yjs, KaTeX, Excalidraw) es pesado: se descarga solo al abrir un apunte libre
 const RichNoteLazy = lazy(() => import('./rich/RichNote.jsx'));
-const RichNote = (props) => <Suspense fallback={<p className="muted">Abriendo editor…</p>}><RichNoteLazy {...props} /></Suspense>;
+const RichNote = (props) => <Suspense fallback={<Loader label="Abriendo editor…" />}><RichNoteLazy {...props} /></Suspense>;
 
 const emptyContent = (type, source = '') =>
   type === 'cornell' ? { rows: [], summary: '' } : type === 'outline' ? { text: '' } : { source, steps: {} };

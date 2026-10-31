@@ -3,6 +3,7 @@ import { History as HistoryIcon, RotateCcw } from 'lucide-react';
 import { watchVersions } from '../../../core/data/db.js';
 import { fmtShort } from '../../../core/lib/dates.js';
 import { useConfirm } from '../../../core/components/ConfirmDialog.jsx';
+import Loader from '../../../core/components/Loader.jsx';
 
 // Historial: versiones automáticas (cada ~5 min de edición) y las que guardes a mano.
 export default function HistoryPanel({ ownerUid, noteId, onSaveNow, onRestore }) {
@@ -26,7 +27,7 @@ export default function HistoryPanel({ ownerUid, noteId, onSaveNow, onRestore })
         <button type="button" className="btn small ghost" disabled={busy} onClick={async () => { setBusy(true); await onSaveNow(); setBusy(false); }}>Guardar versión ahora</button>
       </div>
       {error && <p className="error" role="alert">{error}</p>}
-      {versions === null ? <p className="muted small">Cargando…</p>
+      {versions === null ? <Loader size="sm" />
         : versions.length === 0 ? <p className="muted small">Todavía no hay versiones. Se crean solas mientras escribes.</p> : (
           <ul className="history-list">
             {versions.map((v) => (

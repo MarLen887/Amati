@@ -14,6 +14,7 @@ import PomodoroRing from './PomodoroRing.jsx';
 import PomodoroBreak from './PomodoroBreak.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
 import { useConfirm } from '../../core/components/ConfirmDialog.jsx';
+import Loader from '../../core/components/Loader.jsx';
 
 const HIDE_KEY = 'amati-pomo-hide-time';
 
@@ -335,5 +336,5 @@ export default function PomodoroStudy() {
     );
   }
 
-  return <p className="muted">Cargando…</p>;
+  return <Loader />;
 }

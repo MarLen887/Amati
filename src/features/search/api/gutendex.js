@@ -16,8 +16,16 @@ const flipName = (n) => (n.includes(',') ? n.split(',').slice(1).join(' ').trim(
 export async function searchGutendex(query, { signal, langs = [] } = {}) {
   const p = new URLSearchParams({ search: query });
   if (langs.length) p.set('languages', langs.join(','));
-  const res = await fetch(`https://gutendex.com/books/?${p}`, { signal });
-  if (!res.ok) throw new Error(`Gutendex respondió ${res.status}.`);
+  // Gutendex se satura o se cae a ratos: sin límite de espera dejaría la búsqueda colgada
+  const timeout = AbortSignal.timeout(9000);
+  let res;
+  try {
+    res = await fetch(`https://gutendex.com/books/?${p}`, { signal: signal ? AbortSignal.any([signal, timeout]) : timeout });
+  } catch (e) {
+    if (signal?.aborted) throw e;
+    throw new Error('Gutenberg no respondió a tiempo. Las demás fuentes siguen disponibles.');
+  }
+  if (!res.ok) throw new Error(res.status >= 500 ? 'Gutenberg no está disponible por ahora. Las demás fuentes siguen disponibles.' : `Gutendex respondió ${res.status}.`);
   const data = await res.json();
   return (data.results || []).slice(0, 20).map((b) => {
     const f = b.formats || {};

@@ -27,6 +27,7 @@ import SubjectSelect from '../../subjects/SubjectSelect.jsx';
 import GenerateResources from '../GenerateResources.jsx';
 import BackLink from '../../../core/components/BackLink.jsx';
 import { useConfirm } from '../../../core/components/ConfirmDialog.jsx';
+import Loader from '../../../core/components/Loader.jsx';
 
 const lowlight = createLowlight(common);
 const SAVE_DELAY = 1500;
@@ -67,7 +68,7 @@ export default function RichNote({ ownerUid, noteId }) {
     return () => { provider.destroy(); ydoc.destroy(); setCollab(null); };
   }, [hasNote, ownerUid, noteId, live]);
 
-  if (note === undefined) return <p className="muted">Cargando…</p>;
+  if (note === undefined) return <Loader label="Abriendo apunte…" />;
   if (note === null) return <p>Apunte no encontrado o sin acceso. <Link to="/apuntes">Ver mis apuntes</Link></p>;
 
   return (
@@ -75,7 +76,7 @@ export default function RichNote({ ownerUid, noteId }) {
       <BackLink to="/apuntes">Volver a mis apuntes</BackLink>
       {collab ? (
         <Shell key={collab.ydoc.guid} {...{ note, noteId, ownerUid, isOwner, collab, synced, sync, error, setError, nav, live, user }} />
-      ) : <p className="muted">Abriendo apunte…</p>}
+      ) : <Loader size="sm" label="Abriendo apunte…" />}
     </div>
   );
 }

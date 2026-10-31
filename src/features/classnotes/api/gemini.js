@@ -10,8 +10,8 @@ const ERRORS = {
   429: 'Se alcanzó el límite de uso gratuito de Gemini. Inténtalo en unos minutos.',
 };
 
-// Los modelos de Gemini cambian y se saturan seguido (503) o se retiran (404): si el configurado
-// falla por eso, se prueba con los siguientes de la lista.
+// Los modelos de Gemini cambian y se saturan seguido (503), se retiran (404) o agotan su cuota gratuita (429):
+// si el configurado falla por eso, se prueba con los siguientes de la lista (cada modelo tiene su propia cuota).
 const FALLBACK_MODELS = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-3-flash-preview'];
 
 async function generate(parts, { json = false, signal } = {}) {
@@ -27,7 +27,7 @@ async function generate(parts, { json = false, signal } = {}) {
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': cfg.gemini.key },
       body,
     });
-    if (res.status !== 503 && res.status !== 404) break;
+    if (res.status !== 503 && res.status !== 404 && res.status !== 429) break; // saturado, retirado o sin cuota: prueba el siguiente
   }
   if (!res.ok) throw new Error(ERRORS[res.status] || (res.status >= 500 ? 'Gemini no está disponible ahora mismo.' : `Gemini respondió ${res.status}.`));
   const data = await res.json();

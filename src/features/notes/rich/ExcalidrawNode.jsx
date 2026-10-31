@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Node, mergeAttributes } from '@tiptap/core';
 import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
 import { PencilRuler, X } from 'lucide-react';
+import Loader from '../../../core/components/Loader.jsx';
 
 // Excalidraw pesa bastante: solo se descarga cuando alguien abre o ve un dibujo.
 const DrawingBoard = lazy(() => import('./DrawingBoard.jsx'));
@@ -61,7 +62,7 @@ function DrawingView({ node, updateAttributes, editor, selected, extension }) {
             <span className="small muted grow">Se guarda al pulsar «Listo».</span>
             <button type="button" className="btn small ghost" onClick={() => setOpen(false)}><X size={14} aria-hidden="true" /> Cerrar sin guardar</button>
           </div>
-          <Suspense fallback={<p className="muted" style={{ padding: '1rem' }}>Cargando pizarra…</p>}>
+          <Suspense fallback={<Loader label="Cargando pizarra…" />}>
             <DrawingBoard
               scene={parse(node.attrs.scene)}
               onDone={(elements) => { updateAttributes({ scene: JSON.stringify({ elements }) }); setOpen(false); }}
