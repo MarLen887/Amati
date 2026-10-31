@@ -14,6 +14,7 @@ import { usePomodoro } from '../pomodoro/PomodoroContext.jsx';
 import { useStudyStats } from '../progress/stats.js';
 import { ThemeSwitcher } from '../../core/context/ThemeContext.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
+import DailyGoal from './DailyGoal.jsx';
 
 function greeting() {
   const h = new Date().getHours();
@@ -113,6 +114,8 @@ export default function Home() {
           )}
         </div>
       )}
+
+      <DailyGoal now={now} />
 
       {nextExam && (
         <section className={`panel next-exam ${examDays <= 7 ? 'soon' : ''}`}>

@@ -9,7 +9,7 @@ import { translateQuestions } from './api/translate.js';
 const DIFFICULTY = { '': 'Cualquiera', easy: 'Fácil', medium: 'Media', hard: 'Difícil' };
 
 // Trivia de OpenTDB: obtener preguntas (traducidas al español), jugarlas como mini examen
-// o convertirlas en tarjetas. Cada partida terminada queda registrada en Progreso.
+// o convertirlas en tarjetas. Cada partida terminada cuenta como un día de estudio para tu racha.
 export default function TriviaPanel({ categories, matched, subjects, query = '' }) {
   const { user } = useAuth();
   const best = matched[0]?.id ?? '';
@@ -98,7 +98,7 @@ export default function TriviaPanel({ categories, matched, subjects, query = '' 
     setStage('play');
   }
 
-  // Al terminar la partida se guarda en el historial (Progreso)
+  // Al terminar la partida se guarda en el historial (cuenta para la racha)
   async function finishGame() {
     setStage('done');
     if (recorded.current) return;

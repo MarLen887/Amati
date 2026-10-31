@@ -1,4 +1,4 @@
-// Recorrido guiado de Amati: 2 globos por vista (Inicio, Materias, Biblioteca, Apuntes, Herramientas y Progreso)
+// Recorrido guiado de Amati: 2 globos por vista (Inicio, Materias, Biblioteca, Apuntes, Herramientas y Agenda)
 // y una tarjeta final. Cada globo señala una parte real de la pantalla.
 //   route:   pantalla donde ocurre el paso (el recorrido navega solo)
 //   targets: selectores [data-tour="…"] a probar; se usa el primero que esté visible. Sin objetivo visible, el paso
@@ -9,12 +9,17 @@ export const TOUR_STEPS = [
   {
     id: 'nav', route: '/', targets: ['[data-tour="nav"]'],
     title: 'Tu menú',
-    text: 'Desde aquí llegas a todo: Inicio, Estudiar, Mis materias, Biblioteca, Apuntes, Herramientas, Progreso y tu Perfil. En el celular se abre con el botón ☰.',
+    text: 'Desde aquí llegas a todo: Inicio, Estudiar, Mis materias, Biblioteca, Apuntes, Herramientas, Agenda y tu Perfil. En el celular se abre con el botón ☰.',
   },
   {
     id: 'home-main', route: '/', targets: ['[data-tour="home-main"]'],
     title: 'Inicio: tu siguiente paso',
     text: 'Aquí continúas con la última técnica que usaste. Si todavía no usas ninguna, empiezas creando tu primera materia.',
+  },
+  {
+    id: 'home-goal', route: '/', targets: ['[data-tour="daily-goal"]'],
+    title: 'Tu meta de hoy',
+    text: 'Elige cuántos minutos quieres estudiar al día, con el método que prefieras. El colibrí avanza por la barra conforme estudias, y abajo ves tu semana.',
   },
   // ---- Materias ----
   {
@@ -60,16 +65,16 @@ export const TOUR_STEPS = [
     title: 'Organízalas a tu gusto',
     text: 'Verlas por área, por lo que quieres hacer o en una lista. Marca tus favoritas con la estrella y agrégalas a tus materias.',
   },
-  // ---- Progreso ----
+  // ---- Agenda ----
   {
-    id: 'progress-streak', route: '/progreso', targets: ['[data-tour="progress-metrics"] .metric.streak', '[data-tour="progress-metrics"]'],
-    title: 'Progreso',
-    text: 'Tu racha de días estudiando y el tiempo de esta semana. Sin rankings ni comparaciones: solo tu avance.',
+    id: 'agenda-week', route: '/agenda', targets: ['[data-tour="agenda-week"]'],
+    title: 'Tu agenda',
+    text: 'Agrega tus clases y actividades (cada semana o solo un día). Toca la línea de tiempo para agregar algo a esa hora.',
   },
   {
-    id: 'progress-cards', route: '/progreso', targets: ['[data-tour="progress-metrics"] .metric.ok', '[data-tour="progress-metrics"]'],
-    title: 'Lo dominado y lo pendiente',
-    text: 'Aquí ves las tarjetas que ya dominas y las que tienes pendientes hoy. Si necesitas ayuda, en Perfil → Centro de ayuda repites este recorrido.',
+    id: 'agenda-ai', route: '/agenda', targets: ['[data-tour="agenda-ai"]'],
+    title: 'Tiempo de estudio con ayuda de la IA',
+    text: 'Amati busca huecos de 30 minutos entre semana, con dos opciones por día. Tú apruebas los que te sirvan y te avisamos cuando empiecen. Si necesitas ayuda, en Perfil → Centro de ayuda repites este recorrido.',
   },
   // ---- Final ----
   {

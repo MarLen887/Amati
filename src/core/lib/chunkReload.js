@@ -1,4 +1,4 @@
-// Algunas pantallas (Progreso, herramientas, editor de apuntes) se descargan solo cuando se abren. Si el celular guardó
+// Algunas pantallas (Agenda, herramientas, editor de apuntes) se descargan solo cuando se abren. Si el celular guardó
 // archivos de una versión anterior, esa descarga falla y aparece «Algo no salió como esperábamos».
 // Aquí se resuelve solo: primero se recarga, y si vuelve a fallar se borra la memoria sin conexión y se recarga otra vez.
 const KEY = 'amati-chunk-reload';

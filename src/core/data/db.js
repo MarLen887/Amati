@@ -577,6 +577,42 @@ export async function fetchSessions(uid, since) {
   return s.docs.map(withDates);
 }
 
+// ---------- Agenda: horario, actividades y tiempo de estudio ----------
+// events: { title, kind: 'class' | 'activity' | 'study', recur: 'weekly' | 'none', days: [0-6] (semanal), date: 'AAAA-MM-DD' (una vez),
+//           startMin, endMin (minutos desde medianoche), status (solo estudio): 'proposed' | 'approved' | 'done' | 'skipped', reason }
+const eventsCol = (uid) => sub(uid, 'events');
+
+export function watchEvents(uid, cb, onError) {
+  return onSnapshot(eventsCol(uid), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))), onError);
+}
+
+export async function saveEvent(uid, id, data) {
+  const body = { ...data, updatedAt: serverTimestamp() };
+  if (id) { await setDoc(doc(db, 'users', uid, 'events', id), body, { merge: true }); return id; }
+  const ref = await addDoc(eventsCol(uid), { ...body, createdAt: serverTimestamp() });
+  return ref.id;
+}
+
+export function deleteEvent(uid, id) {
+  return deleteDoc(doc(db, 'users', uid, 'events', id));
+}
+
+// Tiempo estudiado por tu cuenta (con cualquier método): suma a la meta diaria y a la racha
+export function addStudyLog(uid, { minutes, label = '', blockId = '', date = new Date() }) {
+  return addDoc(sub(uid, 'studyLog'), {
+    minutes: Math.max(1, Math.min(600, Math.round(minutes))),
+    label: String(label).slice(0, 100),
+    blockId,
+    dayKey: dayKey(date),
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function fetchStudyLog(uid, since) {
+  const s = await getDocs(query(sub(uid, 'studyLog'), where('dayKey', '>=', dayKey(since))));
+  return s.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
 export async function fetchReviews(uid, since) {
   const s = await getDocs(
     query(sub(uid, 'reviews'), where('reviewedAt', '>=', Timestamp.fromDate(since)), orderBy('reviewedAt', 'asc')),

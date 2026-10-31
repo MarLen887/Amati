@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { RATINGS } from './srs.js';
 import { getScheduler } from './schedulers.js';
 import { practiceKeepsSchedule } from '../../../core/data/db.js';
@@ -37,7 +37,64 @@ export function RatingRow({ card, subject, technique = 'srs', onRate, busy, prac
 
 // Tarjeta con volteo 3D + botones de calificación.
 // Atajos: espacio/Enter = voltear, 1/2/3 = calificar.
+// Deslizar la tarjeta ya volteada: a la izquierda = Difícil, a la derecha = Bien. Los botones y las teclas siguen funcionando.
+const SWIPE = 90; // píxeles para que cuente como calificación
+
 export default function FlashcardView({ card, subject, flipped, onFlip, onRate, busy, practiceCard = false, technique = 'srs' }) {
+  const scene = useRef(null);
+  const drag = useRef(null);
+  const labels = getScheduler(technique).labels;
+
+  // Mueve la tarjeta y tiñe el aviso sin volver a renderizar en cada píxel
+  function setDx(dx) {
+    const el = scene.current;
+    if (!el) return;
+    el.style.transform = dx ? `translateX(${dx}px) rotate(${dx / 25}deg)` : '';
+    el.style.setProperty('--swipe-o', String(Math.min(1, Math.abs(dx) / SWIPE) * 0.92));
+    el.dataset.swipe = Math.abs(dx) > 24 ? (dx < 0 ? 'left' : 'right') : '';
+  }
+  function reset() {
+    const el = scene.current;
+    if (!el) return;
+    el.classList.remove('dragging', 'flying');
+    el.style.opacity = '';
+    setDx(0);
+  }
+  function down(e) {
+    if (!flipped || busy || e.button > 0 || e.target.closest('a, button, input, textarea, select')) return;
+    drag.current = { x: e.clientX, y: e.clientY, id: e.pointerId, moved: false };
+  }
+  function move(e) {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    if (!d.moved) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      if (Math.abs(dy) > Math.abs(dx)) { drag.current = null; return; } // gesto vertical: es para desplazar la pantalla
+      d.moved = true;
+      scene.current?.setPointerCapture?.(e.pointerId);
+      scene.current?.classList.add('dragging');
+    }
+    setDx(dx);
+  }
+  function up(e) {
+    const d = drag.current;
+    drag.current = null;
+    if (!d?.moved) return;
+    scene.current?.classList.remove('dragging');
+    const dx = e.clientX - d.x;
+    if (Math.abs(dx) < SWIPE || busy) { reset(); return; }
+    const rating = dx < 0 ? 'hard' : 'good';
+    const settle = () => reset(); // si no se pudo guardar, la tarjeta vuelve a su lugar
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { Promise.resolve(onRate(rating)).finally(settle); return; }
+    const el = scene.current;
+    el.classList.add('flying');
+    el.style.transform = `translateX(${dx < 0 ? -130 : 130}vw) rotate(${dx < 0 ? -18 : 18}deg)`;
+    el.style.opacity = '0';
+    setTimeout(() => Promise.resolve(onRate(rating)).finally(settle), 180);
+  }
+
   useEffect(() => {
     function onKey(e) {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
@@ -53,7 +110,8 @@ export default function FlashcardView({ card, subject, flipped, onFlip, onRate, 
   return (
     <>
       {/* key: cada tarjeta nueva entra deslizándose, sin mostrar la respuesta durante el giro */}
-      <div className="flash-scene card-enter" key={card.id}>
+      <div ref={scene} className={`flash-scene card-enter ${flipped ? 'swipeable' : ''}`} key={card.id}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={reset}>
         <div
           className={`flashcard ${flipped ? 'flipped' : ''}`}
           onClick={() => !flipped && onFlip()}
@@ -77,7 +135,12 @@ export default function FlashcardView({ card, subject, flipped, onFlip, onRate, 
             {card.back && <p className="flash-answer">{card.back}</p>}
           </div>
         </div>
+        <div className="swipe-overlay" aria-hidden="true">
+          <span className="swipe-label left">{labels.hard.label}</span>
+          <span className="swipe-label right">{labels.good.label}</span>
+        </div>
       </div>
+      {flipped && <p className="small muted center-text swipe-hint">Desliza la tarjeta: ← {labels.hard.label} · {labels.good.label} →</p>}
 
       {!flipped ? (
         <button className="btn primary lg block" onClick={onFlip}>

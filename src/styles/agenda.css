@@ -1,0 +1,69 @@
+/* Agenda: semana, línea de tiempo del día, propuestas de estudio y formularios */
+.agenda-layout { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 980px) { .agenda-layout { grid-template-columns: minmax(0, 1fr) 21rem; } }
+.agenda-main { min-width: 0; }
+.agenda-side { min-width: 0; }
+
+/* Semana */
+.week-nav { display: flex; align-items: center; gap: 0.5rem; }
+.week-title { margin: 0; flex: 1; }
+.week-strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.35rem; }
+.wd { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.5rem 0.2rem 0.45rem; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.2s; }
+.wd:hover { border-color: var(--navy); transform: translateY(-1px); }
+.wd-name { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.wd-num { font-size: 1.15rem; font-weight: 700; line-height: 1.2; }
+.wd-dots { display: flex; gap: 3px; height: 8px; align-items: center; }
+.wd.today .wd-num { color: var(--navy); }
+.wd.sel { background: var(--navy); border-color: var(--navy); color: var(--on-accent); }
+.wd.sel .wd-name, .wd.sel .wd-num { color: var(--on-accent); }
+.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--navy); }
+.dot.activity { background: var(--coral); }
+.dot.study { background: var(--teal); }
+.dot.study.proposed { background: transparent; border: 1.5px dashed var(--teal); }
+.dot.study.done { background: var(--teal); opacity: 0.55; }
+.wd.sel .dot.fixed { background: var(--on-accent); }
+
+.day-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.day-head h3 { margin: 0; }
+
+/* Línea de tiempo del día */
+.timeline { --hour-h: 3.3rem; position: relative; height: calc(var(--hour-h) * var(--hours)); margin-top: 0.4rem; cursor: cell; }
+.hour { position: absolute; left: 0; right: 0; top: calc(var(--hour-h) * var(--h)); border-top: 1px solid var(--line); pointer-events: none; }
+.hour span { position: absolute; top: -0.6rem; left: 0; width: 3rem; font-size: 0.72rem; color: var(--muted); background: var(--bg); padding-right: 0.3rem; font-variant-numeric: tabular-nums; }
+.now-line { position: absolute; left: 3rem; right: 0; top: calc(var(--hour-h) * var(--t)); border-top: 2px solid var(--coral); z-index: 3; pointer-events: none; }
+.now-line span { position: absolute; left: -3rem; top: -0.7rem; font-size: 0.68rem; font-weight: 700; color: var(--on-accent); background: var(--coral); padding: 0.05rem 0.35rem; border-radius: 6px; }
+.ev { --pad: 3.4rem; position: absolute; z-index: 2; top: calc(var(--hour-h) * var(--top)); height: calc(var(--hour-h) * var(--len) - 3px); left: calc(var(--pad) + (100% - var(--pad)) * var(--col) / var(--cols)); width: calc((100% - var(--pad)) / var(--cols) - 4px); min-height: 1.6rem; display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 0.25rem 0.55rem; text-align: left; overflow: hidden; border-radius: 10px; border: 1px solid var(--line); border-left-width: 4px; font: inherit; color: var(--text); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+.ev:hover { transform: translateY(-1px); box-shadow: var(--shadow); z-index: 4; }
+.ev strong { font-size: 0.86rem; line-height: 1.2; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ev span { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+.ev-class { background: color-mix(in srgb, var(--navy) 16%, var(--surface)); border-color: color-mix(in srgb, var(--navy) 35%, var(--line)); border-left-color: var(--navy); }
+.ev-activity { background: color-mix(in srgb, var(--coral) 14%, var(--surface)); border-color: color-mix(in srgb, var(--coral) 35%, var(--line)); border-left-color: var(--coral); }
+.ev-study { background: color-mix(in srgb, var(--teal) 20%, var(--surface)); border-color: color-mix(in srgb, var(--teal) 45%, var(--line)); border-left-color: var(--teal); }
+.ev-study.ev-proposed { background: transparent; border-style: dashed; border-left-style: solid; }
+.ev-study.ev-done { opacity: 0.7; }
+.ev-study.ev-skipped { opacity: 0.45; }
+.ev-study.ev-skipped strong { text-decoration: line-through; }
+
+/* Tarjeta de IA y propuestas */
+.ai-card { border-color: color-mix(in srgb, var(--teal) 40%, var(--line)); }
+.ai-spark { display: inline-grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 12px; background: color-mix(in srgb, var(--teal) 18%, var(--surface)); color: var(--teal); flex: none; }
+.small-h { margin: 0; font-size: 0.95rem; }
+.proposal-list, .schedule-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.proposal { display: flex; align-items: center; gap: 0.2rem; padding: 0.3rem 0.4rem 0.3rem 0.7rem; border: 1px dashed color-mix(in srgb, var(--teal) 55%, var(--line)); border-radius: 12px; }
+.proposal-info { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0.05rem; padding: 0.2rem 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.icon-btn.ok { color: var(--teal); }
+.schedule-list button { width: 100%; display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.5rem; border: 0; border-radius: 10px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.schedule-list button:hover { background: var(--cream); }
+.schedule-list .grow { min-width: 0; overflow-wrap: anywhere; }
+.status-proposed { border-style: dashed; }
+.status-approved, .status-done { background: color-mix(in srgb, var(--teal) 20%, var(--surface)); }
+.shared-actions-left { justify-content: flex-start; }
+
+/* Formulario */
+.day-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.day-chip { width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.15s; }
+.day-chip:hover { border-color: var(--navy); }
+.day-chip.on { background: var(--navy); border-color: var(--navy); color: var(--on-accent); transform: scale(1.06); }
+.time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+@media (prefers-reduced-motion: reduce) { .wd, .ev, .day-chip { transition: none; } }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../core/context/AuthContext.jsx';
-import { fetchSessions, fetchTrivia } from '../../core/data/db.js';
+import { fetchSessions, fetchStudyLog, fetchTrivia } from '../../core/data/db.js';
 import { addDays, dayKey, startOfDay } from '../../core/lib/dates.js';
 
 const MAX_SESSION_MIN = 90; // una sesión abandonada no debe inflar el tiempo estudiado
@@ -40,12 +40,13 @@ export function useStudyStats() {
     let cancelled = false;
     const now = new Date();
     const since = addDays(startOfDay(now), -60);
-    Promise.all([fetchSessions(user.uid, since), fetchTrivia(user.uid, since).catch(() => [])])
-      .then(([sessions, trivia]) => {
+    Promise.all([fetchSessions(user.uid, since), fetchTrivia(user.uid, since).catch(() => []), fetchStudyLog(user.uid, since).catch(() => [])])
+      .then(([sessions, trivia, log]) => {
         if (cancelled) return;
-        const days = new Set([...sessions.map((s) => s.dayKey), ...trivia.map((t) => t.dayKey)]);
+        const days = new Set([...sessions.map((s) => s.dayKey), ...trivia.map((t) => t.dayKey), ...log.map((l) => l.dayKey)]);
         const weekStart = addDays(startOfDay(now), -6);
-        const weekMinutes = sessions.filter((s) => s.startedAt >= weekStart).reduce((a, s) => a + minutesOf(s), 0);
+        const weekMinutes = sessions.filter((s) => s.startedAt >= weekStart).reduce((a, s) => a + minutesOf(s), 0)
+          + log.filter((l) => l.dayKey >= dayKey(weekStart)).reduce((a, l) => a + (l.minutes || 0), 0);
         setStats({ loaded: true, streak: streakOf(days, now), weekMinutes });
       })
       .catch(() => !cancelled && setStats({ loaded: true, streak: 0, weekMinutes: 0 }));

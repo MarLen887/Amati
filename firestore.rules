@@ -75,6 +75,22 @@ service cloud.firestore {
         && d.correct is int && d.correct >= 0 && d.correct <= d.total
         && isText(d.category, 80);
     }
+    function validEvent() {
+      let d = request.resource.data;
+      return isText(d.title, 100) && d.title.size() > 0
+        && d.kind in ['class', 'activity', 'study']
+        && d.recur in ['weekly', 'none']
+        && d.startMin is int && d.endMin is int && d.startMin >= 0 && d.endMin <= 1440 && d.endMin > d.startMin
+        && d.get('days', []) is list && d.get('days', []).size() <= 7
+        && isText(d.get('date', ''), 10)
+        && isText(d.get('reason', ''), 200)
+        && d.get('status', 'approved') in ['proposed', 'approved', 'done', 'skipped'];
+    }
+    function validStudyLog() {
+      let d = request.resource.data;
+      return d.minutes is int && d.minutes >= 1 && d.minutes <= 600
+        && isText(d.dayKey, 10) && isText(d.label, 100) && isText(d.get('blockId', ''), 100);
+    }
     function validClassNote() {
       let d = request.resource.data;
       return isText(d.title, 200) && isText(d.subjectId, 100) && isText(d.text, 150000)
@@ -128,6 +144,17 @@ service cloud.firestore {
       match /classNotes/{id} {
         allow read, delete: if isOwner(uid);
         allow create, update: if isOwner(uid) && validClassNote();
+      }
+      // Agenda: horario, actividades y bloques de estudio (propuestos, aprobados, hechos u omitidos)
+      match /events/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validEvent();
+      }
+      // Tiempo de estudio registrado por tu cuenta (suma a la meta diaria y a la racha)
+      match /studyLog/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create: if isOwner(uid) && validStudyLog();
+        allow update: if false;
       }
       match /reviews/{id} {
         allow read, create, delete: if isOwner(uid);

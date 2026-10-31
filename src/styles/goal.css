@@ -1,0 +1,53 @@
+/* Meta diaria en Inicio (DailyGoal): barra con colibrí + semana animada */
+.goal-hero { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 1.1rem; padding: 1.25rem 1.4rem 1.2rem; border-radius: 22px; }
+.goal-hero::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, var(--teal), var(--navy)); opacity: 0.85; }
+.goal-hero.is-done { border-color: color-mix(in srgb, var(--teal) 55%, var(--line)); }
+.goal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
+.goal-heading { min-width: 0; display: flex; flex-direction: column; gap: 0.15rem; }
+.goal-big { margin: 0; display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; line-height: 1; }
+.goal-num { font-size: clamp(2.6rem, 9vw, 3.4rem); font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.goal-of { color: var(--muted); font-size: 1rem; font-weight: 600; }
+.goal-msg { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.95rem; }
+.is-done .goal-num { color: var(--teal); }
+.goal-pill { display: inline-flex; align-items: center; gap: 0.35rem; flex: none; padding: 0.4rem 0.8rem; border-radius: 999px; border: 1px solid var(--line); background: var(--cream); color: var(--text); font: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
+.goal-pill:hover { border-color: var(--navy); transform: translateY(-1px); }
+
+/* Barra con el colibrí que avanza hacia la meta */
+.goal-lane { position: relative; padding: 1.6rem 1.1rem 0; }
+.goal-track { position: relative; height: 1.1rem; border-radius: 999px; background: var(--cream); border: 1px solid var(--line); overflow: hidden; }
+.goal-fill { position: absolute; inset: 0 auto 0 0; width: calc(var(--p, 0) * 100%); min-width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--teal), var(--navy)); transition: width 1.3s cubic-bezier(.25, .8, .25, 1); overflow: hidden; }
+.goal-shine { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.45) 50%, transparent 80%); transform: translateX(-100%); animation: goal-shine 2.8s ease-in-out 1.4s infinite; }
+.goal-tick { position: absolute; top: 3px; bottom: 3px; width: 2px; border-radius: 2px; background: var(--line); transform: translateX(-1px); }
+.goal-tick.on { background: rgba(255, 255, 255, 0.7); }
+.goal-bird { position: absolute; top: -0.55rem; left: calc(1.1rem + var(--p, 0) * (100% - 2.2rem)); width: 46px; transform: translateX(-70%); transition: left 1.3s cubic-bezier(.25, .8, .25, 1); pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.18)); }
+.goal-bird .hummingbird { display: block; animation: goal-hover 2.2s ease-in-out infinite; }
+.goal-flag { position: absolute; right: 0; bottom: -0.15rem; display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--cream); border: 1px solid var(--line); color: var(--muted); transition: background 0.4s, color 0.4s, transform 0.4s; }
+.goal-flag.on { background: var(--teal); border-color: var(--teal); color: var(--on-accent); transform: scale(1.15); }
+
+.goal-edit { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+/* Semana */
+.goal-week { display: flex; flex-direction: column; gap: 0.6rem; }
+.goal-week-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.goal-week-head p { margin: 0; }
+.week-bars { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.5rem; }
+.week-bars li { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.wk-val { height: 1rem; font-size: 0.72rem; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wk-box { position: relative; width: 100%; height: 4.4rem; display: flex; align-items: flex-end; justify-content: center; }
+.wk-goal { position: absolute; left: 0; right: 0; border-top: 1px dashed color-mix(in srgb, var(--muted) 60%, transparent); }
+.wk-bar { display: block; width: min(100%, 1.9rem); height: var(--h); border-radius: 9px 9px 5px 5px; background: color-mix(in srgb, var(--navy) 38%, var(--line)); transform-origin: bottom; animation: wk-rise 0.8s cubic-bezier(.25, .8, .25, 1) both; animation-delay: calc(var(--i) * 70ms + 200ms); }
+.week-bars li.met .wk-bar { background: linear-gradient(180deg, var(--teal), color-mix(in srgb, var(--teal) 55%, var(--navy))); }
+.week-bars li.today .wk-bar { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--navy); }
+.week-bars li.today.met .wk-bar { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--teal); }
+.wk-day { font-size: 0.74rem; color: var(--muted); font-weight: 600; }
+.week-bars li.today .wk-day { color: var(--text); }
+.goal-stats { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; font-size: 0.88rem; color: var(--muted); }
+.goal-stats strong { color: var(--text); }
+
+@keyframes goal-shine { 0% { transform: translateX(-100%); } 55%, 100% { transform: translateX(100%); } }
+@keyframes goal-hover { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes wk-rise { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .goal-fill, .goal-bird { transition: none; }
+  .goal-shine, .goal-bird .hummingbird, .wk-bar { animation: none; }
+}

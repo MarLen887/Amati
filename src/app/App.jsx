@@ -21,7 +21,7 @@ import Apuntes from '../features/notes/Apuntes.jsx';
 import NoteEditor, { SharedNote } from '../features/notes/NoteEditor.jsx';
 import PomodoroStudy from '../features/pomodoro/PomodoroStudy.jsx';
 import { PomodoroProvider } from '../features/pomodoro/PomodoroContext.jsx';
-const Progress = lazy(() => import('../features/progress/Progress.jsx'));
+const Agenda = lazy(() => import('../features/agenda/Agenda.jsx'));
 import Settings from '../features/settings/Settings.jsx';
 import Loader from '../core/components/Loader.jsx';
 const Admin = lazy(() => import('../features/admin/Admin.jsx'));
@@ -117,7 +117,8 @@ export default function App() {
             <Route path="pomodoro" element={<PomodoroStudy />} />
             <Route path="herramientas" element={<Tools />} />
             <Route path="herramientas/:id" element={<ToolHost />} />
-            <Route path="progreso" element={<Progress />} />
+            <Route path="agenda" element={<Agenda />} />
+            <Route path="progreso" element={<Navigate to="/agenda" replace />} />
             <Route path="perfil" element={<Settings />} />
             <Route path="ajustes" element={<Navigate to="/perfil" replace />} />
             <Route path="como-funciona" element={<HowItWorks />} />

@@ -3,11 +3,12 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useData } from '../context/DataContext.jsx';
 import Logo from './Logo.jsx';
-import { BookMarked, ChartLine, GraduationCap, House, Library, Menu, NotebookPen, User, Wrench, X } from 'lucide-react';
+import { BookMarked, CalendarDays, GraduationCap, House, Library, Menu, NotebookPen, User, Wrench, X } from 'lucide-react';
 import Ambient from './Ambient.jsx';
 import ErrorBoundary from './ErrorBoundary.jsx';
 import FlyingBird from './FlyingBird.jsx';
 import SharedNoticeModal from './SharedNoticeModal.jsx';
+import StudyReminders from '../../features/agenda/StudyReminders.jsx';
 import PomodoroPill from '../../features/pomodoro/PomodoroPill.jsx';
 import { TOOLS } from '../../features/tools/tools.js';
 import { TutorialProvider } from '../../features/tutorial/TutorialContext.jsx';
@@ -21,7 +22,7 @@ const NAV = [
   { to: '/biblioteca', label: 'Biblioteca', Icon: Library, match: ['/biblioteca'] },
   { to: '/apuntes', label: 'Apuntes', Icon: NotebookPen, match: ['/apuntes', '/clases'] },
   { to: '/herramientas', label: 'Herramientas', Icon: Wrench, match: ['/herramientas'] },
-  { to: '/progreso', label: 'Progreso', Icon: ChartLine, match: ['/progreso'] },
+  { to: '/agenda', label: 'Agenda', Icon: CalendarDays, match: ['/agenda'] },
   { to: '/perfil', label: 'Perfil', Icon: User, match: ['/perfil', '/admin'] },
 ];
 
@@ -33,7 +34,7 @@ const TITLES = [
   ['/clases/nueva', 'Nuevo apunte de clase'], ['/apuntes/nuevo', 'Nuevo apunte'], // las rutas más específicas van primero
   ['/materias', 'Mis materias'], ['/tecnicas', 'Estudiar'], ['/estudiar', 'Repaso de tarjetas'], ['/pomodoro', 'Pomodoro'],
   ['/biblioteca', 'Biblioteca'], ['/apuntes', 'Apuntes'], ['/clases', 'Apuntes'], ['/herramientas', 'Herramientas'],
-  ['/progreso', 'Progreso'], ['/perfil', 'Perfil y ayuda'], ['/ajustes', 'Perfil y ayuda'], ['/como-funciona', '¿Cómo funciona?'], ['/admin', 'Administración'],
+  ['/agenda', 'Agenda'], ['/perfil', 'Perfil y ayuda'], ['/ajustes', 'Perfil y ayuda'], ['/como-funciona', '¿Cómo funciona?'], ['/admin', 'Administración'],
 ];
 export const pageTitle = (pathname) => {
   if (pathname === '/') return 'Inicio';
@@ -123,6 +124,7 @@ export default function Layout() {
       <PomodoroPill />
       <FlyingBird />
       <SharedNoticeModal />
+      <StudyReminders />
 
       {menuOpen && (
         <div className="menu-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setMenuOpen(false)}>

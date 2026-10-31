@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from './AuthContext.jsx';
-import { markSharedSeen, sharedKey, watchCards, watchClassNotes, watchNotes, watchLibros, watchSharedNotes, watchSubjects } from '../data/db.js';
+import { markSharedSeen, sharedKey, watchCards, watchClassNotes, watchEvents, watchNotes, watchLibros, watchSharedNotes, watchSubjects } from '../data/db.js';
 import { isDue } from '../../features/techniques/cards/srs.js';
 
 const DataContext = createContext(null);
@@ -15,6 +15,7 @@ export function DataProvider({ children }) {
   const [classNotes, setClassNotes] = useState([]);
   const [shared, setShared] = useState([]); // apuntes que otras personas compartieron conmigo
   const [sharedError, setSharedError] = useState('');
+  const [events, setEvents] = useState([]); // horario, actividades y bloques de estudio de la Agenda
   const [error, setError] = useState(null);
   const [now, setNow] = useState(() => new Date());
 
@@ -26,6 +27,7 @@ export function DataProvider({ children }) {
     const u3 = watchNotes(user.uid, setNotes, () => setNotes([]));
     const u4 = watchLibros(user.uid, setLibros, () => setLibros([]));
     const u5 = watchClassNotes(user.uid, setClassNotes, () => setClassNotes([]));
+    const u7 = watchEvents(user.uid, setEvents, () => setEvents([]));
     // «Compartidos conmigo» se escucha en toda la app (no solo en Apuntes) para avisar apenas llegue uno
     const u6 = watchSharedNotes(user.email, (list) => { setShared(list.filter((n) => n.ownerUid !== user.uid)); setSharedError(''); }, (e) => {
       console.error('Apuntes compartidos:', e);
@@ -33,6 +35,7 @@ export function DataProvider({ children }) {
       setSharedError(e?.code === 'permission-denied' ? 'permisos' : e?.code === 'failed-precondition' ? 'índice' : 'conexión');
     });
     return () => {
+      u7();
       u6();
       u1();
       u2();
@@ -72,6 +75,7 @@ export function DataProvider({ children }) {
       classNotes,
       shared,
       sharedError,
+      events,
       sharedNew,
       markSharedSeen: markShared,
       subjectMap,
@@ -80,7 +84,7 @@ export function DataProvider({ children }) {
       error,
       now,
     };
-  }, [subjects, cards, notes, libros, classNotes, shared, sharedError, sharedNew, markShared, error, now]);
+  }, [subjects, cards, notes, libros, classNotes, events, shared, sharedError, sharedNew, markShared, error, now]);
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }
