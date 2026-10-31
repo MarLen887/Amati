@@ -1,6 +1,7 @@
 // Catálogo de herramientas de Amati, organizado por áreas de la universidad y por necesidad.
 // Cada herramienta: { id, name, short, areas: [ids de ÁREAS], category, icon, status }
-//   areas: todas las áreas = herramienta transversal (se agrupa en «Para todas las carreras»).
+//   areas: todas las áreas = herramienta transversal (se agrupa en «Para todas las carreras»). Las demás van en UNA sola
+//   área (la que mejor encaja), para que no aparezcan repetidas en varias secciones.
 //   status: 'soon' (aún sin conectar) | 'ready' (funcional; llevará `to` con su ruta cuando exista).
 // Las entradas actuales son de muestra: se reemplazan al conectar cada API.
 
@@ -40,23 +41,21 @@ export const TOOLS = [
   R('translate', 'Traductor', 'Español ↔ inglés, francés, portugués, alemán e italiano.', ALL_AREAS, 'escribir', 'Languages'),
   R('spell', 'Corrector de ortografía y estilo', 'Ortografía, gramática y estilo con explicación (LanguageTool).', ALL_AREAS, 'escribir', 'SpellCheck'),
 
-  // ---- Ciencias de la Salud ----
-  R('timeline', 'Líneas de tiempo', 'Crea líneas de tiempo con fechas, textos e imágenes (TimelineJS).', ['salud', 'artes', 'negocios'], 'visualizar', 'History'),
-
   // ---- Artes y Humanidades ----
-  R('dictionary', 'Diccionario de inglés', 'Definiciones, pronunciación, ejemplos y etimología.', ['artes', 'negocios'], 'investigar', 'BookOpenText'),
-  R('synonyms', 'Sinónimos y palabras relacionadas', 'Sinónimos, antónimos, rimas y asociaciones (Datamuse).', ['artes', 'negocios'], 'escribir', 'Shuffle'),
+  R('timeline', 'Líneas de tiempo', 'Crea líneas de tiempo con fechas, textos e imágenes (TimelineJS).', ['artes'], 'visualizar', 'History'),
+  R('dictionary', 'Diccionario de inglés', 'Definiciones, pronunciación, ejemplos y etimología.', ['artes'], 'investigar', 'BookOpenText'),
+  R('synonyms', 'Sinónimos y palabras relacionadas', 'Sinónimos, antónimos, rimas y asociaciones (Datamuse).', ['artes'], 'escribir', 'Shuffle'),
 
-  // ---- Ciencias de la vida ----
-  R('molecules', 'Moléculas y compuestos', 'Busca en PubChem y gira la molécula en 3D (Kekule.js).', ['vida', 'salud', 'ing'], 'investigar', 'FlaskConical'),
+  // ---- Ciencias de la Salud ----
+  R('molecules', 'Moléculas y compuestos', 'Busca en PubChem y gira la molécula en 3D (Kekule.js).', ['salud'], 'investigar', 'FlaskConical'),
 
   // ---- Ingenierías ----
-  R('flow', 'Diagramas interactivos', 'Arma algoritmos, redes y arquitecturas arrastrando y conectando nodos (React Flow).', ['ing', 'negocios'], 'visualizar', 'Waypoints'),
-  R('algebra', 'Álgebra y cálculo simbólico', 'Resuelve, deriva, integra, factoriza y simplifica (Nerdamer).', ['ing', 'vida', 'negocios', 'salud'], 'calcular', 'Sigma'),
-  R('graph', 'Graficadora de funciones', 'Gráficas interactivas con Desmos.', ['ing', 'vida', 'negocios', 'salud'], 'visualizar', 'ChartLine'),
-  R('physics', 'Simulador de física', 'Tiro parabólico y colisiones (PhysicsJS).', ['ing', 'vida'], 'practicar', 'Orbit'),
+  R('flow', 'Diagramas interactivos', 'Arma algoritmos, redes y arquitecturas arrastrando y conectando nodos (React Flow).', ['ing'], 'visualizar', 'Waypoints'),
+  R('algebra', 'Álgebra y cálculo simbólico', 'Resuelve, deriva, integra, factoriza y simplifica (Nerdamer).', ['ing'], 'calcular', 'Sigma'),
+  R('graph', 'Graficadora de funciones', 'Gráficas interactivas con Desmos.', ['ing'], 'visualizar', 'ChartLine'),
+  R('physics', 'Simulador de física', 'Tiro parabólico y colisiones (PhysicsJS).', ['ing'], 'practicar', 'Orbit'),
   R('code', 'Programar y retos', 'Ejecuta código en +10 lenguajes y valida tus soluciones (Judge0).', ['ing'], 'practicar', 'Terminal'),
-  R('sql', 'Laboratorio SQL', 'Practica consultas reales en tu navegador (sql.js).', ['ing', 'negocios'], 'practicar', 'Database'),
+  R('sql', 'Laboratorio SQL', 'Practica consultas reales en tu navegador (sql.js).', ['ing'], 'practicar', 'Database'),
   R('github', 'Proyectos de GitHub', 'Encuentra proyectos reales y entiéndelos con IA (GitHub API).', ['ing'], 'investigar', 'GitBranch'),
   R('stack', 'Tutor de errores', 'Busca el error en Stack Overflow y te lo explica (Stack Exchange API).', ['ing'], 'investigar', 'LifeBuoy'),
 

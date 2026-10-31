@@ -41,6 +41,7 @@ export default function SharePanel({ ownerUid, noteId, emails, title = '', onClo
         await sendShareEmail({
           to: v,
           fromName: profile?.displayName || user?.email || 'Un compañero',
+          replyTo: user?.email || '',
           noteTitle: title || 'Apunte sin título',
           link: `${window.location.origin}/apuntes/compartido/${ownerUid}/${noteId}`,
         });
