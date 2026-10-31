@@ -5,7 +5,7 @@ import { useData } from '../../core/context/DataContext.jsx';
 import { createCard, deleteCard, updateCard } from '../../core/data/db.js';
 import { cardStatus, isDue } from '../techniques/cards/srs.js';
 import { fmtShort } from '../../core/lib/dates.js';
-import { CircleCheck, Compass, FileText, Layers, Lightbulb, Pencil, PenLine, Plus, Search, Sparkles, Trash2, Upload } from 'lucide-react';
+import { CircleCheck, Compass, FileText, Layers, Library as LibraryIcon, Lightbulb, NotebookPen, Pencil, PenLine, Play, Plus, Search, ShieldCheck, Sparkles, Trash2, Upload, Wrench } from 'lucide-react';
 import CardForm from './CardForm.jsx';
 import ImportCards from './ImportCards.jsx';
 import EmptyState from '../../core/components/EmptyState.jsx';
@@ -22,6 +22,7 @@ import { NOTE_TYPES, techniqueUrl } from '../techniques/techniques.js';
 import TechniqueChip from '../techniques/TechniqueChip.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
 import BackLink from '../../core/components/BackLink.jsx';
+import '../../styles/subject-detail.css';
 import { useConfirm } from '../../core/components/ConfirmDialog.jsx';
 
 const STATUS_LABEL = { new: 'Nueva', learning: 'Aprendiendo', mastered: 'Dominada' };
@@ -83,6 +84,8 @@ export default function SubjectDetail() {
       (!q || (c.front || '').toLowerCase().includes(q) || (c.back || '').toLowerCase().includes(q)),
   );
   const due = subjectCards.filter((c) => isDue(c, now)).length;
+  const mastered = subjectCards.filter((c) => cardStatus(c) === 'mastered').length;
+  const masteredPct = subjectCards.length ? Math.round((mastered / subjectCards.length) * 100) : 0;
   const studyHref = `/tecnicas?materia=${id}${topicFilter ? `&tema=${encodeURIComponent(topicFilter)}` : ''}`;
 
   async function remove(c) {
@@ -93,24 +96,46 @@ export default function SubjectDetail() {
   const openImport = () => { setImporting(true); setImported(0); setAdding(false); setCardsOpen(true); };
 
   return (
-    <div className="stack-lg">
+    <div className="stack-lg subject-page" style={{ '--sc': subject.color || undefined }}>
       <div className="stack">
         <BackLink to="/materias">Materias</BackLink>
-        <div className="row between wrap gap">
-          <h1 className="row gap">
-            <span className="dot-color lg" style={{ background: subject.color }} />
-            {subject.name}
-          </h1>
-          <div className="row gap wrap">
-            {!subject.sample && <button type="button" className="btn ghost" onClick={() => setModal('edit')}><Pencil size={16} aria-hidden="true" /> Editar</button>}
-            {!subject.sample && <button type="button" className="btn ghost danger" onClick={() => setModal('delete')}><Trash2 size={16} aria-hidden="true" /> Eliminar</button>}
-            {subjectCards.length > 0 && (
-              <Link to={studyHref} className="btn primary">
-                <Compass size={16} aria-hidden="true" /> Estudiar{due > 0 ? ` (${due})` : ''}
-              </Link>
-            )}
+        <header className="subject-hero">
+          <div className="hero-top">
+            <span className="subject-badge" aria-hidden="true">{(subject.name || '?').trim().charAt(0).toUpperCase()}</span>
+            <div className="hero-title">
+              <p className="eyebrow">Materia</p>
+              <h1>{subject.name}</h1>
+            </div>
+            <div className="hero-actions">
+              {subjectCards.length > 0 && (
+                <Link to={studyHref} className="btn primary lg">
+                  <Play size={16} fill="currentColor" aria-hidden="true" /> Estudiar{due > 0 ? ` · ${due}` : ''}
+                </Link>
+              )}
+              {!subject.sample && (
+                <MoreMenu label="Más acciones de la materia" items={[
+                  { label: 'Editar materia', onClick: () => setModal('edit') },
+                  { label: 'Eliminar materia', onClick: () => setModal('delete'), danger: true },
+                ]} />
+              )}
+            </div>
           </div>
-        </div>
+          <ul className="hero-stats" aria-label="Resumen de la materia">
+            <li className={due > 0 ? 'hl' : ''}>
+              <span className="hs-label"><Layers size={14} aria-hidden="true" /> Pendientes hoy</span>
+              <span className="hs-value">{due}</span>
+            </li>
+            <li>
+              <span className="hs-label"><ShieldCheck size={14} aria-hidden="true" /> Dominadas</span>
+              <span className="hs-value">{mastered}<small> / {subjectCards.length}</small></span>
+              <span className="mini-bar" aria-hidden="true"><i style={{ '--w': `${masteredPct}%` }} /></span>
+            </li>
+            <li>
+              <span className="hs-label"><NotebookPen size={14} aria-hidden="true" /> Apuntes</span>
+              <span className="hs-value">{subjectNotes.length + subjectClassNotes.length}</span>
+            </li>
+          </ul>
+        </header>
       </div>
 
       {subject.sample && (
@@ -245,18 +270,18 @@ export default function SubjectDetail() {
       </section>
       )}
 
-      <div className="tabs" role="tablist" aria-label="Contenido de la materia">
-        <button role="tab" aria-selected={tab === 'notes'} className={tab === 'notes' ? 'active' : ''} onClick={() => setTab('notes')}>
-          Apuntes <span className="tab-count">{subjectNotes.length}</span>
+      <div className="seg-tabs" role="tablist" aria-label="Contenido de la materia">
+        <button role="tab" aria-selected={tab === 'notes'} onClick={() => setTab('notes')}>
+          <NotebookPen size={16} aria-hidden="true" /> Apuntes <span className="tab-count">{subjectNotes.length}</span>
         </button>
-        <button role="tab" aria-selected={tab === 'class'} className={tab === 'class' ? 'active' : ''} onClick={() => setTab('class')}>
-          Clases <span className="tab-count">{subjectClassNotes.length}</span>
+        <button role="tab" aria-selected={tab === 'class'} onClick={() => setTab('class')}>
+          <FileText size={16} aria-hidden="true" /> Clases <span className="tab-count">{subjectClassNotes.length}</span>
         </button>
-        <button role="tab" aria-selected={tab === 'tools'} className={tab === 'tools' ? 'active' : ''} onClick={() => setTab('tools')}>
-          Herramientas <span className="tab-count">{(subject.toolIds || []).length}</span>
+        <button role="tab" aria-selected={tab === 'tools'} onClick={() => setTab('tools')}>
+          <Wrench size={16} aria-hidden="true" /> Herramientas <span className="tab-count">{(subject.toolIds || []).length}</span>
         </button>
-        <button role="tab" aria-selected={tab === 'resources'} className={tab === 'resources' ? 'active' : ''} onClick={() => setTab('resources')}>
-          Biblioteca <span className="tab-count">{subjectLibros.length}</span>
+        <button role="tab" aria-selected={tab === 'resources'} onClick={() => setTab('resources')}>
+          <LibraryIcon size={16} aria-hidden="true" /> Biblioteca <span className="tab-count">{subjectLibros.length}</span>
         </button>
       </div>
 
@@ -288,8 +313,11 @@ export default function SubjectDetail() {
 
       {tab === 'notes' && (
         <section className="stack">
-          <p className="small muted">Crea un apunte nuevo. Pasa el puntero sobre una técnica para ver de qué trata:</p>
-          <div className="chips">
+          <div className="create-head">
+            <h2 className="h3">Crear un apunte</h2>
+            <p className="small muted">Pasa el puntero sobre una técnica para ver de qué trata.</p>
+          </div>
+          <div className="create-tiles">
             {Object.entries(NOTE_TYPES).map(([k, v]) => (
               <TechniqueChip key={k} noteType={k} primary={k === 'libre'} to={techniqueUrl(v.technique, { subjectId: id })} />
             ))}

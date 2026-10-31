@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { NotebookPen, Trash2 } from 'lucide-react';
 import { useAuth } from '../../core/context/AuthContext.jsx';
 import { useData } from '../../core/context/DataContext.jsx';
 import { deleteNote } from '../../core/data/db.js';
@@ -35,7 +36,7 @@ export function NotesList({ subjectId = '', compact = false }) {
         </div>
       )}
       {list.length === 0 ? (
-        <p className="muted small">Todavía no hay apuntes aquí.</p>
+        <p className="empty-note"><NotebookPen size={20} aria-hidden="true" /> Todavía no hay apuntes aquí. Elige una técnica para crear el primero.</p>
       ) : (
         <ul className="note-list">
           {list.map((n) => {
@@ -46,11 +47,14 @@ export function NotesList({ subjectId = '', compact = false }) {
                 <span className="technique-icon">{t && <TechniqueIcon name={t.icon} />}</span>
                 <Link to={`/apuntes/${n.id}`} className="grow note-link">
                   <strong>{n.title}</strong>
-                  <span className="small muted">
-                    {t?.name}{s ? ` · ${s.name}` : ''}{n.topic ? ` · ${n.topic}` : ''} · {fmtShort(n.updatedAt || n.createdAt || new Date())}
+                  <span className="note-meta">
+                    {t?.name && <span className="tag">{t.name}</span>}
+                    {s && !subjectId && <span>{s.name}</span>}
+                    {n.topic && <span>{n.topic}</span>}
+                    <span>{fmtShort(n.updatedAt || n.createdAt || new Date())}</span>
                   </span>
                 </Link>
-                <button className="btn small ghost danger" onClick={() => remove(n)}>Eliminar</button>
+                <button type="button" className="icon-btn trash" aria-label={`Eliminar el apunte ${n.title}`} title="Eliminar" onClick={() => remove(n)}><Trash2 size={17} aria-hidden="true" /></button>
               </li>
             );
           })}
