@@ -7,7 +7,7 @@ import { BookMarked, ChartLine, GraduationCap, House, Library, Menu, NotebookPen
 import Ambient from './Ambient.jsx';
 import ErrorBoundary from './ErrorBoundary.jsx';
 import FlyingBird from './FlyingBird.jsx';
-import SharedToast from './SharedToast.jsx';
+import SharedNoticeModal from './SharedNoticeModal.jsx';
 import PomodoroPill from '../../features/pomodoro/PomodoroPill.jsx';
 import { TOOLS } from '../../features/tools/tools.js';
 import { TutorialProvider } from '../../features/tutorial/TutorialContext.jsx';
@@ -122,7 +122,7 @@ export default function Layout() {
 
       <PomodoroPill />
       <FlyingBird />
-      <SharedToast />
+      <SharedNoticeModal />
 
       {menuOpen && (
         <div className="menu-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setMenuOpen(false)}>

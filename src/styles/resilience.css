@@ -61,11 +61,17 @@
   .sprout-stem, .sprout-leaf { animation: none; transform: none; }
 }
 
-/* Aviso dentro de la app cuando alguien comparte un apunte (SharedToast) y etiqueta «Nuevo» */
-.shared-toast { position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 80; display: flex; align-items: center; gap: 0.75rem; max-width: min(26rem, calc(100vw - 2rem)); padding: 0.75rem 0.9rem; background: var(--surface); color: var(--text); border: 1px solid var(--navy); border-radius: var(--radius); box-shadow: var(--shadow); animation: toast-in 0.3s ease; }
-.shared-toast-icon { flex: none; color: var(--navy); }
-.shared-toast-text { margin: 0; font-size: 0.92rem; min-width: 0; overflow-wrap: anywhere; }
+/* Aviso en ventana cuando alguien comparte un apunte (SharedNoticeModal) y etiqueta «Nuevo» */
+.shared-backdrop { z-index: 85; background: rgba(15, 18, 32, 0.72); }
+.shared-card { width: min(28rem, 100%); max-height: 100%; overflow-y: auto; text-align: center; justify-items: center; border: 2px solid var(--navy); animation: shared-in 0.3s ease; }
+.shared-icon { margin-inline: auto; display: inline-grid; place-items: center; width: 4rem; height: 4rem; border-radius: 50%; background: var(--cream); color: var(--navy); }
+.shared-card h2 { margin: 0; font-size: 1.4rem; }
+.shared-note-title { margin: 0; font-size: 1.15rem; font-weight: 650; overflow-wrap: anywhere; }
+.shared-list { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 0.4rem; text-align: left; }
+.shared-list a { display: flex; flex-direction: column; gap: 0.1rem; padding: 0.6rem 0.8rem; border: 1px solid var(--line); border-radius: 12px; color: inherit; text-decoration: none; }
+.shared-list a:hover { border-color: var(--navy); background: var(--cream); }
+.shared-actions { justify-content: center; }
 .new-tag { background: var(--navy); color: var(--on-accent); border-color: transparent; font-weight: 600; }
-@keyframes toast-in { from { opacity: 0; transform: translateY(0.75rem); } to { opacity: 1; transform: none; } }
-@media (max-width: 640px) { .shared-toast { left: 1rem; right: 1rem; max-width: none; } }
-@media (prefers-reduced-motion: reduce) { .shared-toast { animation: none; } }
+@keyframes shared-in { from { opacity: 0; transform: translateY(0.75rem) scale(0.97); } to { opacity: 1; transform: none; } }
+@media (max-width: 480px) { .shared-actions { flex-direction: column-reverse; align-items: stretch; } .shared-actions .btn { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .shared-card { animation: none; } }
