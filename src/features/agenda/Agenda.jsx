@@ -119,7 +119,7 @@ export default function Agenda() {
             <button type="button" className="btn small primary" onClick={() => setForm({ preset: { recur: 'none', date: selKey } })}><Plus size={15} aria-hidden="true" /> Agregar</button>
           </div>
 
-          <div className="timeline" style={{ '--hours': TL_END - TL_START }} onClick={addAt} role="group" aria-label={`Horario del ${fmtLong(sel)}`}>
+          <div className="timeline" data-tour="agenda-day" style={{ '--hours': TL_END - TL_START }} onClick={addAt} role="group" aria-label={`Horario del ${fmtLong(sel)}`}>
             {Array.from({ length: TL_END - TL_START + 1 }, (_, i) => (
               <div key={i} className="hour" style={{ '--h': i }}><span>{String(TL_START + i).padStart(2, '0')}:00</span></div>
             ))}
@@ -229,7 +229,7 @@ function Notifications() {
   }
 
   return (
-    <section className="panel stack-sm">
+    <section className="panel stack-sm" data-tour="agenda-notify">
       <div className="row gap"><Bell size={18} aria-hidden="true" /><h2 className="h3">Avisos</h2></div>
       <p className="small muted">Cuando empiece un tiempo de estudio aprobado, Amati te muestra un aviso en pantalla. Funciona mientras tengas Amati abierta en el navegador.</p>
       {perm === 'granted' ? (

@@ -1,5 +1,6 @@
-// Recorrido guiado de Amati: 2 globos por vista (Inicio, Materias, Biblioteca, Apuntes, Herramientas y Agenda)
-// y una tarjeta final. Cada globo señala una parte real de la pantalla.
+// Recorrido guiado de Amati: globos por vista (Inicio, Estudiar, Materias, Biblioteca, Apuntes, Herramientas, Agenda y Perfil)
+// y una tarjeta final. Cada globo señala una parte real de la pantalla: si cambias una pantalla, revisa que su
+// [data-tour="…"] siga existiendo (sin objetivo visible, el globo sale al centro).
 //   route:   pantalla donde ocurre el paso (el recorrido navega solo)
 //   targets: selectores [data-tour="…"] a probar; se usa el primero que esté visible. Sin objetivo visible, el paso
 //            se muestra al centro (por ejemplo, cuando una lista está vacía).
@@ -14,12 +15,18 @@ export const TOUR_STEPS = [
   {
     id: 'home-main', route: '/', targets: ['[data-tour="home-main"]'],
     title: 'Inicio: tu siguiente paso',
-    text: 'Aquí continúas con la última técnica que usaste. Si todavía no usas ninguna, empiezas creando tu primera materia.',
+    text: 'Aquí continúas con la última técnica que usaste y, justo debajo, puedes elegir otra. Si todavía no usas ninguna, empieza creando tu primera materia.',
   },
   {
     id: 'home-goal', route: '/', targets: ['[data-tour="daily-goal"]'],
     title: 'Tu meta de hoy',
     text: 'Elige cuántos minutos quieres estudiar al día, con el método que prefieras. El colibrí avanza por la barra conforme estudias, y abajo ves tu semana.',
+  },
+  // ---- Estudiar ----
+  {
+    id: 'techniques', route: '/tecnicas', targets: ['[data-tour="techniques"]'],
+    title: 'Estudiar',
+    text: 'Cuéntanos qué quieres lograr (entender un tema, memorizar, preparar un examen…) y te sugerimos hasta 3 técnicas. Tú decides con cuál empezar.',
   },
   // ---- Materias ----
   {
@@ -30,7 +37,7 @@ export const TOUR_STEPS = [
   {
     id: 'subjects-main', route: '/materias', targets: ['[data-tour="subjects-main"]'],
     title: 'Entra a una materia',
-    text: 'Toca una materia para ver su contenido y continuar con la técnica que usaste en ella. Con el menú ⋯ puedes editarla o eliminarla.',
+    text: 'Toca una materia para ver sus pendientes, apuntes, clases, herramientas y biblioteca, y continuar con la técnica que usaste en ella.',
   },
   // ---- Biblioteca ----
   {
@@ -69,12 +76,33 @@ export const TOUR_STEPS = [
   {
     id: 'agenda-week', route: '/agenda', targets: ['[data-tour="agenda-week"]'],
     title: 'Tu agenda',
-    text: 'Agrega tus clases y actividades (cada semana o solo un día). Toca la línea de tiempo para agregar algo a esa hora.',
+    text: 'Aquí ves tu semana. Toca un día para ver su horario y usa «Agregar» para sumar tus clases y actividades, cada semana o solo un día.',
+  },
+  {
+    id: 'agenda-day', route: '/agenda', targets: ['[data-tour="agenda-day"]'],
+    title: 'El horario del día',
+    text: 'Toca cualquier hora de la línea de tiempo para agregar algo ahí. Las clases, las actividades y tus tiempos de estudio tienen colores distintos.',
   },
   {
     id: 'agenda-ai', route: '/agenda', targets: ['[data-tour="agenda-ai"]'],
     title: 'Tiempo de estudio con ayuda de la IA',
-    text: 'Amati busca huecos de 30 minutos entre semana, con dos opciones por día. Tú apruebas los que te sirvan y te avisamos cuando empiecen. Si necesitas ayuda, en Perfil → Centro de ayuda repites este recorrido.',
+    text: 'Amati busca huecos de 30 minutos entre semana, con dos opciones por día y sin empalmarse con tus clases. Las propuestas aparecen aquí y tú apruebas las que te sirvan: nada se agenda sin tu permiso.',
+  },
+  {
+    id: 'agenda-notify', route: '/agenda', targets: ['[data-tour="agenda-notify"]'],
+    title: 'Avisos cuando empiece tu estudio',
+    text: 'Cuando empiece un tiempo de estudio aprobado, Amati te avisa en pantalla (y con una notificación del navegador si la activas aquí). Funciona con Amati abierta en el navegador.',
+  },
+  // ---- Perfil ----
+  {
+    id: 'profile-install', route: '/perfil', targets: ['[data-tour="install-app"]'],
+    title: 'Instala Amati como app',
+    text: 'Desde aquí la instalas en tu celular o computadora, con su ícono y a pantalla completa. En iPhone se hace desde «Compartir» → «Añadir a pantalla de inicio».',
+  },
+  {
+    id: 'profile-help', route: '/perfil', targets: ['[data-tour="help-center"]'],
+    title: 'Centro de ayuda',
+    text: 'Aquí repites este recorrido, ves el video de bienvenida y encuentras las preguntas frecuentes.',
   },
   // ---- Final ----
   {

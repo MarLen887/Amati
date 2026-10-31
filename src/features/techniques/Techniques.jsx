@@ -54,7 +54,7 @@ export default function Techniques() {
 
   return (
     <div className="stack-lg">
-      <header className="page-head">
+      <header className="page-head" data-tour="techniques">
         <h1>Estudiar</h1>
         <p className="muted">Cuéntanos qué quieres lograr y te sugerimos cómo hacerlo.</p>
       </header>
