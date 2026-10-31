@@ -60,3 +60,12 @@
   .sprout-loader { animation: sprout-in 0.01s ease 0.3s forwards; }
   .sprout-stem, .sprout-leaf { animation: none; transform: none; }
 }
+
+/* Aviso dentro de la app cuando alguien comparte un apunte (SharedToast) y etiqueta «Nuevo» */
+.shared-toast { position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 80; display: flex; align-items: center; gap: 0.75rem; max-width: min(26rem, calc(100vw - 2rem)); padding: 0.75rem 0.9rem; background: var(--surface); color: var(--text); border: 1px solid var(--navy); border-radius: var(--radius); box-shadow: var(--shadow); animation: toast-in 0.3s ease; }
+.shared-toast-icon { flex: none; color: var(--navy); }
+.shared-toast-text { margin: 0; font-size: 0.92rem; min-width: 0; overflow-wrap: anywhere; }
+.new-tag { background: var(--navy); color: var(--on-accent); border-color: transparent; font-weight: 600; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(0.75rem); } to { opacity: 1; transform: none; } }
+@media (max-width: 640px) { .shared-toast { left: 1rem; right: 1rem; max-width: none; } }
+@media (prefers-reduced-motion: reduce) { .shared-toast { animation: none; } }

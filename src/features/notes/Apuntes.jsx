@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, ImageIcon, NotebookPen, PenLine, Plus, Search, Upload, Users } from 'lucide-react';
 import { useAuth } from '../../core/context/AuthContext.jsx';
 import { useData } from '../../core/context/DataContext.jsx';
-import { watchSharedNotes } from '../../core/data/db.js';
+import { sharedKey } from '../../core/data/db.js';
 import { AddSubjectButton } from '../subjects/SubjectSelect.jsx';
 import EmptyState from '../../core/components/EmptyState.jsx';
 import { fmtShort } from '../../core/lib/dates.js';
@@ -27,14 +27,8 @@ const plain = (n) => {
 // Apuntes: todo el contenido propio (fotos, PDFs y notas escritas con una técnica) en un solo lugar.
 export default function Apuntes() {
   const { user } = useAuth();
-  const { classNotes, notes, subjects, subjectMap } = useData();
-  const [shared, setShared] = useState([]);
-  const [sharedError, setSharedError] = useState('');
-  useEffect(() => watchSharedNotes(user.email, (list) => { setShared(list); setSharedError(''); }, (e) => {
-    console.error('Apuntes compartidos:', e);
-    setShared([]);
-    setSharedError(e?.code === 'permission-denied' ? 'permisos' : e?.code === 'failed-precondition' ? 'índice' : 'conexión');
-  }), [user.email]);
+  const { classNotes, notes, subjects, subjectMap, shared, sharedError, sharedNew, markSharedSeen } = useData();
+  const newKeys = useMemo(() => new Set(sharedNew.map(sharedKey)), [sharedNew]);
   const [filter, setFilter] = useState('all');
   const [q, setQ] = useState('');
   const [subject, setSubject] = useState('');
@@ -51,7 +45,7 @@ export default function Apuntes() {
       tag: TECHNIQUE_MAP[NOTE_TYPES[n.type]?.technique]?.name || n.type,
     }));
     const others = shared.filter((n) => n.ownerUid !== user.uid).map((n) => ({
-      key: `s-${n.id}`, kind: 'shared', title: n.title, subjectId: '', date: n.updatedAt || n.createdAt || new Date(),
+      key: `s-${n.id}`, kind: 'shared', isNew: newKeys.has(sharedKey(n)), by: n.sharedBy?.name || n.sharedBy?.email || '', title: n.title, subjectId: '', date: n.updatedAt || n.createdAt || new Date(),
       text: plain(n), href: `/apuntes/compartido/${n.ownerUid}/${n.id}`, thumb: null, Icon: Users, tag: 'Compartido',
     }));
     const needle = q.trim().toLowerCase();
@@ -60,7 +54,7 @@ export default function Apuntes() {
       .filter((i) => !subject || i.subjectId === subject)
       .filter((i) => !needle || `${i.title} ${i.text}`.toLowerCase().includes(needle))
       .sort((a, b) => b.date - a.date);
-  }, [classNotes, notes, shared, filter, q, subject, user.uid]);
+  }, [classNotes, notes, shared, newKeys, filter, q, subject, user.uid]);
 
   const total = classNotes.length + notes.length + shared.length;
 
@@ -74,6 +68,14 @@ export default function Apuntes() {
           <AddSubjectButton><Plus size={16} aria-hidden="true" /> Agregar materia</AddSubjectButton>
         </span>
       </header>
+
+      {sharedNew.length > 0 && (
+        <p className="small row gap wrap" role="status">
+          <span className="tag new-tag">Nuevo</span>
+          {sharedNew.length === 1 ? 'Te compartieron un apunte.' : `Te compartieron ${sharedNew.length} apuntes.`}
+          <button type="button" className="link-btn" onClick={() => markSharedSeen(sharedNew)}>Marcar como visto</button>
+        </p>
+      )}
 
       {sharedError && (
         <p className="error" role="alert">
@@ -131,10 +133,11 @@ export default function Apuntes() {
                       : <div className="classnote-thumb empty" aria-hidden="true"><i.Icon size={28} /></div>}
                     <div className="classnote-body">
                       <strong>{i.title}</strong>
-                      <span className="small muted">{subjectMap[i.subjectId]?.name ? `${subjectMap[i.subjectId].name} · ` : ''}{fmtShort(i.date)}</span>
+                      <span className="small muted">{i.by ? `De ${i.by} · ` : ''}{subjectMap[i.subjectId]?.name ? `${subjectMap[i.subjectId].name} · ` : ''}{fmtShort(i.date)}</span>
                       <p className="small snippet">{i.text.trim() ? i.text.trim().slice(0, 110) : 'Sin texto todavía'}</p>
                       <span className="row gap wrap">
                         <span className="tag">{i.tag}</span>
+                        {i.isNew && <span className="tag new-tag">Nuevo</span>}
                         {i.ai && <span className="tag pick-tag">Texto con IA</span>}
                       </span>
                     </div>

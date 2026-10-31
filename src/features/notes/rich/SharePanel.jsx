@@ -21,9 +21,9 @@ export default function SharePanel({ ownerUid, noteId, emails, title = '', onClo
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  async function save(next) {
+  async function save(next, sharedBy = null) {
     setBusy(true); setError('');
-    try { await setCollaborators(ownerUid, noteId, next); } catch (e) { setError('No se pudo actualizar. ' + e.message); } finally { setBusy(false); }
+    try { await setCollaborators(ownerUid, noteId, next, sharedBy); } catch (e) { setError('No se pudo actualizar. ' + e.message); } finally { setBusy(false); }
   }
 
   async function add(e) {
@@ -34,7 +34,7 @@ export default function SharePanel({ ownerUid, noteId, emails, title = '', onClo
     if (emails.length >= MAX) { setError(`Máximo ${MAX} personas por apunte.`); return; }
     setEmail('');
     setInfo('');
-    await save([...emails, v]);
+    await save([...emails, v], { name: profile?.displayName || user?.email, email: user?.email });
     // Aviso por correo a la persona invitada; si falla, la invitación igual queda hecha
     if (emailJsReady) {
       try {
@@ -48,7 +48,7 @@ export default function SharePanel({ ownerUid, noteId, emails, title = '', onClo
         setInfo(`Le avisamos por correo a ${v}.`);
       } catch (err) {
         console.error("EmailJS:", err.message);
-        setInfo(`Invitaste a ${v}, pero no se pudo enviar el aviso por correo (${err.message}). Podrá verlo en «Compartidos conmigo».`);
+        setInfo(`Invitaste a ${v}, pero no se pudo enviar el aviso por correo. Podrá verlo en «Compartidos conmigo».`);
       }
     } else {
       setInfo(`Invitaste a ${v}. Lo verá en «Compartidos conmigo».`);

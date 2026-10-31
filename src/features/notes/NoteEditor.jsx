@@ -164,6 +164,12 @@ function NewRichNote() {
 // Apunte libre que otra persona compartió conmigo
 export function SharedNote() {
   const { owner, id } = useParams();
+  const { shared, markSharedSeen } = useData();
+  // Al abrir el apunte compartido deja de contar como nuevo (en todos mis dispositivos)
+  useEffect(() => {
+    const n = shared.find((x) => x.id === id && x.ownerUid === owner);
+    if (n) markSharedSeen([n]);
+  }, [shared, id, owner, markSharedSeen]);
   return <RichNote key={id} ownerUid={owner} noteId={id} />;
 }
 

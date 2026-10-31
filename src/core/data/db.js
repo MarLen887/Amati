@@ -1,6 +1,7 @@
 // Capa de acceso a datos (Firestore)
 import {
   addDoc,
+  arrayUnion,
   collection,
   deleteDoc,
   collectionGroup,
@@ -30,7 +31,7 @@ const sub = (uid, name) => collection(db, 'users', uid, name);
 function withDates(snap) {
   const d = snap.data();
   const out = { id: snap.id, ...d };
-  for (const k of ['dueDate', 'lastReviewed', 'createdAt', 'updatedAt', 'startedAt', 'endedAt', 'reviewedAt', 'examDate', 'classDate']) {
+  for (const k of ['dueDate', 'lastReviewed', 'createdAt', 'updatedAt', 'startedAt', 'endedAt', 'reviewedAt', 'examDate', 'classDate', 'sharedAt']) {
     if (k in d) out[k] = toDate(d[k]);
   }
   return out;
@@ -326,8 +327,22 @@ export function setNoteMeta(owner, id, { subjectId, topic }) {
   return updateDoc(noteDoc(owner, id), { subjectId: subjectId || '', topic: (topic || '').trim().slice(0, 80) });
 }
 
-export function setCollaborators(owner, id, emails) {
-  return updateDoc(noteDoc(owner, id), { collaboratorEmails: emails });
+// `sharedBy` (solo al agregar a alguien) deja quién compartió y cuándo: con eso el invitado recibe el aviso dentro de Amati
+export function setCollaborators(owner, id, emails, sharedBy = null) {
+  const body = { collaboratorEmails: emails };
+  if (sharedBy) {
+    body.sharedBy = { name: String(sharedBy.name || '').slice(0, 80), email: String(sharedBy.email || '').slice(0, 120) };
+    body.sharedAt = serverTimestamp();
+  }
+  return updateDoc(noteDoc(owner, id), body);
+}
+
+// Clave estable de un apunte compartido conmigo (el id solo es único dentro de cada dueño)
+export const sharedKey = (n) => `${n.ownerUid}_${n.id}`;
+
+// Guarda en mi perfil qué apuntes compartidos ya vi (se sincroniza entre mis dispositivos)
+export function markSharedSeen(uid, keys) {
+  return keys.length ? updateDoc(userRef(uid), { seenShared: arrayUnion(...keys) }) : Promise.resolve();
 }
 
 // Apuntes que otras personas compartieron conmigo

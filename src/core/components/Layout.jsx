@@ -7,6 +7,7 @@ import { BookMarked, ChartLine, GraduationCap, House, Library, Menu, NotebookPen
 import Ambient from './Ambient.jsx';
 import ErrorBoundary from './ErrorBoundary.jsx';
 import FlyingBird from './FlyingBird.jsx';
+import SharedToast from './SharedToast.jsx';
 import PomodoroPill from '../../features/pomodoro/PomodoroPill.jsx';
 import { TOOLS } from '../../features/tools/tools.js';
 import { TutorialProvider } from '../../features/tutorial/TutorialContext.jsx';
@@ -43,9 +44,10 @@ export const pageTitle = (pathname) => {
 
 export default function Layout() {
   const { profile } = useAuth();
-  const { dueCards } = useData();
+  const { dueCards, sharedNew } = useData();
   const inApp = profile?.reminders?.inApp !== false;
   const due = dueCards.length;
+  const newShared = sharedNew.length;
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const mainRef = useRef(null);
@@ -65,8 +67,9 @@ export default function Layout() {
   // Notificación dentro de la app: contador discreto en la pestaña del navegador.
   useEffect(() => {
     const page = pageTitle(pathname);
-    document.title = `${inApp && due > 0 ? `(${due}) ` : ''}${page ? `${page} · ` : ''}Amati`;
-  }, [due, inApp, pathname]);
+    const count = (inApp ? due : 0) + newShared;
+    document.title = `${count > 0 ? `(${count}) ` : ''}${page ? `${page} · ` : ''}Amati`;
+  }, [due, newShared, inApp, pathname]);
 
   // Al cambiar de pantalla el foco pasa al contenido (teclado y lector de pantalla); no al cargar la primera vez
   useEffect(() => {
@@ -92,6 +95,7 @@ export default function Layout() {
               aria-current={isActive(n, pathname) ? 'page' : undefined}>
               {n.label}
               {n.to === '/' && inApp && due > 0 && <span className="badge">{due}</span>}
+              {n.to === '/apuntes' && newShared > 0 && <span className="badge">{newShared}<span className="sr-only"> {newShared === 1 ? 'apunte compartido nuevo' : 'apuntes compartidos nuevos'}</span></span>}
             </Link>
           ))}
         </nav>
@@ -104,6 +108,7 @@ export default function Layout() {
         <button type="button" className="menu-toggle" data-tour="nav" aria-label="Abrir menú" aria-expanded={menuOpen} aria-controls="mobile-menu"
           onClick={() => setMenuOpen(true)}>
           <Menu size={24} aria-hidden="true" />
+          {newShared > 0 && <span className="badge dot" aria-hidden="true" />}
         </button>
         </div>
       </header>
@@ -117,6 +122,7 @@ export default function Layout() {
 
       <PomodoroPill />
       <FlyingBird />
+      <SharedToast />
 
       {menuOpen && (
         <div className="menu-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setMenuOpen(false)}>
@@ -130,6 +136,7 @@ export default function Layout() {
                 aria-current={isActive(n, pathname) ? 'page' : undefined}>
                 <n.Icon size={22} strokeWidth={1.8} aria-hidden="true" />
                 <span>{n.label}</span>
+                {n.to === '/apuntes' && newShared > 0 && <span className="badge">{newShared}<span className="sr-only"> compartidos nuevos</span></span>}
               </Link>
             ))}
           </nav>
