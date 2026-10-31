@@ -75,3 +75,7 @@
 @keyframes shared-in { from { opacity: 0; transform: translateY(0.75rem) scale(0.97); } to { opacity: 1; transform: none; } }
 @media (max-width: 480px) { .shared-actions { flex-direction: column-reverse; align-items: stretch; } .shared-actions .btn { width: 100%; justify-content: center; } }
 @media (prefers-reduced-motion: reduce) { .shared-card { animation: none; } }
+
+/* Inicio: «Elegir otra técnica» como botón visible bajo el botón principal */
+.btn.other-technique { justify-content: center; font-weight: 650; border: 1.5px solid color-mix(in srgb, var(--navy) 60%, var(--line)); background: color-mix(in srgb, var(--navy) 9%, var(--surface)); color: var(--navy); }
+.btn.other-technique:hover:not(:disabled) { background: color-mix(in srgb, var(--navy) 16%, var(--surface)); border-color: var(--navy); }

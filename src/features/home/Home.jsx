@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookPlus, CalendarClock, Flame, Library, Play, Timer, Upload } from 'lucide-react';
+import { ArrowRight, BookPlus, CalendarClock, Flame, Library, Play, Shuffle, Timer, Upload } from 'lucide-react';
 import Hummingbird from '../../core/components/Hummingbird.jsx';
 import EmptyState from '../../core/components/EmptyState.jsx';
 import { useAuth } from '../../core/context/AuthContext.jsx';
@@ -107,7 +107,7 @@ export default function Home() {
           {lastTech ? (
             <>
               <Link to={techniqueUrl(last, { practice: due === 0 })} className="btn primary xl block breathe-btn"><Play size={22} fill="currentColor" aria-hidden="true" /> Continuar con {lastTech.name}</Link>
-              <p className="center-text small"><Link to="/tecnicas">Elegir otra técnica</Link></p>
+              <Link to="/tecnicas" className="btn ghost lg block other-technique"><Shuffle size={18} aria-hidden="true" /> Elegir otra técnica</Link>
             </>
           ) : (
             <Link to="/tecnicas" className="btn primary xl block breathe-btn"><Play size={22} fill="currentColor" aria-hidden="true" /> Empezar sesión de estudio</Link>
