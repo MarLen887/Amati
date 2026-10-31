@@ -18,7 +18,7 @@ export function cloudinaryThumb(url) {
 export function uploadToCloudinary(file, { onProgress, folder = 'amati/clases' } = {}) {
   return new Promise((resolve, reject) => {
     if (!cloudinaryConfigured) {
-      reject(new Error('Cloudinary no está configurado (VITE_CLOUDINARY_CLOUD_NAME y VITE_CLOUDINARY_UPLOAD_PRESET).'));
+      reject(new Error('Por ahora no se pueden subir archivos. Inténtalo más tarde.'));
       return;
     }
     const fd = new FormData();

@@ -61,11 +61,15 @@ function NotConfigured() {
   return (
     <div className="center-screen">
       <div className="panel narrow">
-        <h1>Falta configurar Firebase</h1>
-        <p>
-          Copia <code>.env.example</code> como <code>.env.local</code>, llena los datos de tu proyecto de
-          Firebase y reinicia el servidor de desarrollo.
-        </p>
+        <h1>Amati no está disponible por ahora</h1>
+        {import.meta.env.DEV ? (
+          <p>
+            Falta configurar Firebase: copia <code>.env.example</code> como <code>.env.local</code>, llena los datos de tu
+            proyecto y reinicia el servidor de desarrollo.
+          </p>
+        ) : (
+          <p>Estamos resolviendo un problema. Inténtalo de nuevo en unos minutos.</p>
+        )}
       </div>
     </div>
   );

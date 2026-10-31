@@ -42,7 +42,7 @@ export default function Grapher() {
   // Cada instancia de Desmos se crea en su propio <div> nuevo y se retira al salir: así no se mezcla con restos de
   // otra instancia (el modo estricto de React monta, desmonta y vuelve a montar los componentes en desarrollo).
   useEffect(() => {
-    if (!KEY) { setError('Falta la llave de Desmos (VITE_DESMOS_API_KEY).'); return undefined; }
+    if (!KEY) { setError('La graficadora no está disponible por ahora.'); return undefined; }
     let cancelled = false;
     let timer;
     let c = null;

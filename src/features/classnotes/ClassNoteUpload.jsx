@@ -167,7 +167,7 @@ export default function ClassNoteUpload() {
           {file && (
             <label className="checkbox">
               <input type="checkbox" checked={ocr && has.gemini} disabled={!has.gemini || busy} onChange={(e) => setOcr(e.target.checked)} />
-              Extraer el texto con IA (Gemini){!has.gemini && ' — sin configurar'}
+              Extraer el texto con IA (Gemini){!has.gemini && ' — no disponible por ahora'}
             </label>
           )}
           <label>

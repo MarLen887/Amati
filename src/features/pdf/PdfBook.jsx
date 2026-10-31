@@ -63,7 +63,7 @@ export default function PdfBook() {
                 <Layers size={16} aria-hidden="true" /> {busy === 'cards' ? 'Creando…' : 'Crear tarjetas con IA'}
               </button>
             </div>
-          ) : <p className="small muted">Conecta Gemini (VITE_GEMINI_API_KEY) para resumir y crear tarjetas.</p>}
+          ) : <p className="small muted">Resumir y crear tarjetas con IA no está disponible por ahora.</p>}
         </section>
       )}
 

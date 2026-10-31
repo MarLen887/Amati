@@ -75,7 +75,7 @@ export default function Synonyms() {
           <button className="btn primary" disabled={busy || !q.trim() || (lang === 'es' && !spanishOk)}>{busy ? 'Buscando…' : 'Buscar'}</button>
         </form>
         <div className="chips">{EXAMPLES[lang].map((w) => <button key={w} type="button" className="chip" disabled={lang === 'es' && !spanishOk} onClick={() => search(w)}>{w}</button>)}</div>
-        {lang === 'es' && !spanishOk && <p className="notice warn small">Las relaciones de significado en español necesitan la IA (Gemini): configura <code>VITE_GEMINI_API_KEY</code>. En inglés funciona sin llaves.</p>}
+        {lang === 'es' && !spanishOk && <p className="notice warn small">Las relaciones de significado en español no están disponibles por ahora. En inglés funcionan sin problema.</p>}
         {lang === 'es' && spanishOk && <p className="small muted row gap"><Sparkles size={13} aria-hidden="true" /> En español los resultados los genera la IA; revisa que se ajusten a tu contexto.</p>}
         {error && <p className="error" role="alert">{error}</p>}
       </section>

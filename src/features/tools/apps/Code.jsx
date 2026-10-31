@@ -56,9 +56,9 @@ const norm = (s) => s.replace(/\r/g, '').split('\n').map((l) => l.replace(/\s+$/
 
 async function api(path, init) {
   let res;
-  try { res = await fetch(`${BASE}${path}`, { ...init, headers: { ...headers(), ...(init?.headers || {}) } }); } catch { throw new Error('No se pudo conectar con Judge0. Revisa tu conexión.'); }
-  if (res.status === 429) throw new Error('Judge0 recibió demasiadas ejecuciones seguidas. Espera unos segundos e inténtalo de nuevo.');
-  if (!res.ok) throw new Error(`Judge0 respondió ${res.status}. Inténtalo de nuevo en un momento.`);
+  try { res = await fetch(`${BASE}${path}`, { ...init, headers: { ...headers(), ...(init?.headers || {}) } }); } catch { throw new Error('No se pudo ejecutar el código. Revisa tu conexión.'); }
+  if (res.status === 429) throw new Error('Hiciste demasiadas ejecuciones seguidas. Espera unos segundos e inténtalo de nuevo.');
+  if (!res.ok) throw new Error('No se pudo ejecutar el código ahora mismo. Inténtalo de nuevo en un momento.');
   return res.json();
 }
 
@@ -180,7 +180,7 @@ ${info.slice(0, 2000)}`));
       <section className="panel stack">
         <div className="row gap wrap between">
           <div className="chips" role="group" aria-label="Lenguaje">
-            {langs === null ? <span className="small muted"><Loader2 size={14} className="spin" aria-hidden="true" /> Conectando con Judge0…</span>
+            {langs === null ? <span className="small muted"><Loader2 size={14} className="spin" aria-hidden="true" /> Preparando el editor…</span>
               : available.map((l) => <button key={l.key} type="button" className={`chip ${lang === l.key ? 'active' : ''}`} aria-pressed={lang === l.key} onClick={() => setLang(l.key)}>{l.label}</button>)}
           </div>
           <div className="row gap">
@@ -195,7 +195,7 @@ ${info.slice(0, 2000)}`));
           <textarea className="mono-ish" rows={2} value={stdin} onChange={(e) => setStdin(e.target.value)} spellCheck="false" />
         </label>
         {error && <p className="error" role="alert">{error}</p>}
-        <p className="small muted">Tu código se ejecuta en Judge0 ({new URL(BASE).host}), un servicio externo gratuito con límite de uso. No escribas datos personales.</p>
+        <p className="small muted">Tu código se ejecuta en un servicio externo gratuito con límite de uso. No escribas datos personales.</p>
       </section>
 
       {result && (

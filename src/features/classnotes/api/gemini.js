@@ -3,11 +3,11 @@
 import { cfg } from './integrations.js';
 
 const ERRORS = {
-  400: 'Gemini rechazó la solicitud (revisa que la llave sea válida).',
-  401: 'La llave de Gemini no es válida.',
-  403: 'La llave de Gemini no tiene permiso o no está autorizada para este dominio.',
-  404: 'El modelo de Gemini no existe: revisa VITE_GEMINI_MODEL.',
-  429: 'Se alcanzó el límite de uso gratuito de Gemini. Inténtalo en unos minutos.',
+  400: 'Las funciones con IA no están disponibles por ahora. Inténtalo más tarde.',
+  401: 'Las funciones con IA no están disponibles por ahora. Inténtalo más tarde.',
+  403: 'Las funciones con IA no están disponibles por ahora. Inténtalo más tarde.',
+  404: 'Las funciones con IA no están disponibles por ahora. Inténtalo más tarde.',
+  429: 'La IA recibió demasiadas solicitudes. Inténtalo en unos minutos.',
 };
 
 // Los modelos de Gemini cambian y se saturan seguido (503), se retiran (404) o agotan su cuota gratuita (429):
@@ -19,16 +19,26 @@ async function generate(parts, { json = false, signal } = {}) {
     contents: [{ role: 'user', parts }],
     generationConfig: { temperature: 0.2, ...(json ? { responseMimeType: 'application/json' } : {}) },
   });
-  let res;
+  let res = null;
   for (const model of [...new Set([cfg.gemini.model, ...FALLBACK_MODELS])]) {
-    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST',
-      signal,
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': cfg.gemini.key },
-      body,
-    });
+    // Un modelo saturado a veces ni responde: tras 25 s se prueba con el siguiente en lugar de dejar la pantalla colgada
+    const timeout = AbortSignal.timeout(25000);
+    try {
+      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: 'POST',
+        signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': cfg.gemini.key },
+        body,
+      });
+    } catch (e) {
+      if (signal?.aborted) throw e;
+      res = null;
+      continue;
+    }
     if (res.status !== 503 && res.status !== 404 && res.status !== 429) break; // saturado, retirado o sin cuota: prueba el siguiente
   }
+  if (!res) throw new Error('Gemini tardó demasiado en responder. Inténtalo de nuevo en un momento.');
+  if (!res.ok) console.error(`Amati: Gemini respondió ${res.status} (revisa la llave y VITE_GEMINI_MODEL)`); // el detalle técnico va a la consola, no al usuario
   if (!res.ok) throw new Error(ERRORS[res.status] || (res.status >= 500 ? 'Gemini no está disponible ahora mismo.' : `Gemini respondió ${res.status}.`));
   const data = await res.json();
   if (data.promptFeedback?.blockReason) throw new Error('Gemini bloqueó el contenido de este archivo.');

@@ -158,7 +158,7 @@ async function fetchSeries(id, freq) {
       return obs;
     }
     lastMsg = Array.isArray(json) ? json.join(' ') : '';
-    if (/token/i.test(lastMsg) && !/No se encontraron/i.test(lastMsg)) throw new Error('El token del INEGI no es válido. Revisa VITE_INEGI_TOKEN.');
+    if (/token/i.test(lastMsg) && !/No se encontraron/i.test(lastMsg)) throw new Error('Los datos del INEGI no están disponibles por ahora. Inténtalo más tarde.');
   }
   throw new Error(/No se encontraron/i.test(lastMsg)
     ? 'El INEGI no tiene datos nacionales para este indicador. Prueba con otro de la lista.'
@@ -270,14 +270,14 @@ Responde con: 1) «Qué muestran los datos», 2) «Momentos importantes» (picos
   if (!TOKEN) {
     return (
       <section className="panel stack">
-        <h2 className="h3">Falta conectar el INEGI</h2>
-        <p>Esta herramienta usa las APIs del INEGI, que piden un token gratuito.</p>
-        <ol className="stack-sm" style={{ paddingLeft: '1.2rem' }}>
-          <li>Solicítalo en <a href="https://www.inegi.org.mx/servicios/api_indicadores.html" target="_blank" rel="noreferrer noopener">inegi.org.mx/servicios/api_indicadores.html</a> (llegará a tu correo).</li>
-          <li>Agrégalo en <code>.env.local</code>: <code>VITE_INEGI_TOKEN=tu_token</code>.</li>
-          <li>Reinicia <code>npm run dev</code> (o vuelve a compilar).</li>
-        </ol>
-        <p className="small muted">El token viaja en el navegador: es de uso gratuito y solo de consulta de datos públicos.</p>
+        <h2 className="h3">Los datos del INEGI no están disponibles por ahora</h2>
+        <p>Inténtalo más tarde. Mientras tanto puedes consultar los indicadores directamente en <a href="https://www.inegi.org.mx/" target="_blank" rel="noreferrer noopener">inegi.org.mx</a>.</p>
+        {import.meta.env.DEV && (
+          <ol className="stack-sm small" style={{ paddingLeft: '1.2rem' }}>
+            <li>Solicita un token gratuito en <a href="https://www.inegi.org.mx/servicios/api_indicadores.html" target="_blank" rel="noreferrer noopener">inegi.org.mx/servicios/api_indicadores.html</a>.</li>
+            <li>Agrégalo en <code>.env.local</code> como <code>VITE_INEGI_TOKEN=tu_token</code> y reinicia el servidor.</li>
+          </ol>
+        )}
       </section>
     );
   }

@@ -67,9 +67,9 @@ async function fetchEntries(word) {
 async function wk(word, path, params = {}) {
   const qs = new URLSearchParams({ api_key: WK, ...params });
   const res = await fetch(`${WORDNIK}/${encodeURIComponent(word)}/${path}?${qs}`);
-  if (res.status === 401 || res.status === 403) throw new Error('La llave de Wordnik no es válida.');
-  if (res.status === 429) throw new Error('Wordnik alcanzó su límite de consultas por hora.');
-  if (!res.ok) throw new Error(`Wordnik respondió ${res.status}.`);
+  if (res.status === 401 || res.status === 403) throw new Error('Los ejemplos y la etimología no están disponibles por ahora.');
+  if (res.status === 429) throw new Error('Se alcanzó el límite de consultas por hora (ejemplos y etimología). Inténtalo más tarde.');
+  if (!res.ok) throw new Error('No se pudieron cargar los ejemplos y la etimología. Inténtalo de nuevo.');
   return res.json();
 }
 const stripTags = (s) => s.replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ').replace(/\s+/g, ' ').trim();
@@ -114,7 +114,7 @@ export default function Dictionary() {
       wk(w, 'examples', { limit: 5, useCanonical: true }), wk(w, 'etymologies', { useCanonical: true }),
       wk(w, 'frequency', { startYear: 1900, endYear: 2012, useCanonical: true }), wk(w, 'relatedWords', { useCanonical: true, limitPerRelationshipType: 8 }),
     ]);
-    const bad = [ex, et, fr, rel].find((r) => r.status === 'rejected' && /llave|límite/.test(r.reason?.message));
+    const bad = [ex, et, fr, rel].find((r) => r.status === 'rejected' && /disponibles|límite/.test(r.reason?.message));
     if (bad) setAdvErr(bad.reason.message);
     setAdv({
       examples: ex.status === 'fulfilled' ? (ex.value.examples || []).slice(0, 5) : [],
@@ -182,7 +182,7 @@ export default function Dictionary() {
       {first && WK && (
         <section className="panel stack" aria-label="Información avanzada">
           <h2 className="h3">Más a fondo <span className="tag">Wordnik</span></h2>
-          {advErr ? <p className="error" role="alert">{advErr}</p> : !adv ? <p className="muted small">Consultando Wordnik…</p> : (
+          {advErr ? <p className="error" role="alert">{advErr}</p> : !adv ? <p className="muted small">Buscando ejemplos y etimología…</p> : (
             <>
               {adv.examples.length > 0 && (
                 <div className="stack-sm"><strong className="small">Ejemplos reales</strong>

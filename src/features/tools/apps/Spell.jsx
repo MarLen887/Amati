@@ -31,7 +31,7 @@ const EXAMPLES = [
 ];
 
 async function check(text, language, signal) {
-  const body = new URLSearchParams({ text, language, level: 'default', ...(language === 'auto' ? { preferredVariants: 'en-US,de-DE,pt-PT,es' } : {}) });
+  const body = new URLSearchParams({ text, language, level: 'default', ...(language === 'auto' ? { preferredVariants: 'en-US,de-DE,pt-PT' } : {}) });
   let res;
   try { res = await fetch(`${URL_LT}/v2/check`, { method: 'POST', body, signal }); } catch (e) { if (e.name === 'AbortError') throw e; throw new Error('No se pudo conectar con LanguageTool. Revisa tu conexión.'); }
   if (res.status === 429) throw new Error('LanguageTool recibió demasiadas revisiones seguidas. Espera un minuto.');

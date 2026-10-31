@@ -215,7 +215,7 @@ function Detail({ note }) {
             </button>
           </div>
         ) : (
-          <p className="small muted">Conecta Gemini (VITE_GEMINI_API_KEY) para extraer texto, resumir y crear tarjetas automáticamente.</p>
+          <p className="small muted">Extraer texto, resumir y crear tarjetas con IA no está disponible por ahora.</p>
         )}
         <div className="stack-sm">
           <span className="field-label">Trabajarla con una técnica</span>

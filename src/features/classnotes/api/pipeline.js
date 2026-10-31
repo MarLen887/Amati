@@ -51,7 +51,7 @@ export async function processUpload(rawFile, { ocr = true, onStage = () => {}, o
   if (rawFile.size > LIMITS.file) throw new Error('El archivo pesa más de 25 MB.');
   const provider = chooseProvider(rawFile);
   if (provider === 'none' && !(ocr && has.gemini)) {
-    throw new Error('No hay servicios configurados para guardar ni leer este archivo (ver README).');
+    throw new Error('Por ahora no se pueden guardar ni leer archivos. Inténtalo más tarde.');
   }
 
   // La ventana de permiso de Google debe abrirse al instante, mientras dura el clic del usuario.

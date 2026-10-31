@@ -29,7 +29,7 @@ export default function GenerateResources({ getText, title = '', subjectId = '',
   const [error, setError] = useState('');
 
   if (!has.gemini) {
-    return <p className="small muted">Conecta Gemini (VITE_GEMINI_API_KEY) para generar resúmenes y tarjetas desde tus apuntes.</p>;
+    return <p className="small muted">Generar resúmenes y tarjetas con IA no está disponible por ahora.</p>;
   }
 
   async function run(key, fn) {
