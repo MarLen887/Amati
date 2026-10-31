@@ -42,7 +42,7 @@
 
 /* Indicador de carga: brote que crece (componente Loader). Espera 0.3 s antes de mostrarse para no parpadear. */
 .sprout-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; color: var(--muted); text-align: center; opacity: 0; animation: sprout-in 0.35s ease 0.3s forwards; }
-.sprout-lg { min-height: 100vh; padding: 1rem; }
+.sprout-lg { min-height: 100vh; min-height: 100dvh; padding: 1rem; }
 .sprout-md { padding: 2.5rem 1rem; }
 .sprout-sm { flex-direction: row; justify-content: flex-start; gap: 0.5rem; padding: 0.4rem 0; font-size: 0.9rem; }
 .sprout-art { width: 7.5rem; height: auto; overflow: visible; }
@@ -79,3 +79,20 @@
 /* Inicio: «Elegir otra técnica» como botón visible bajo el botón principal */
 .btn.other-technique { justify-content: center; font-weight: 650; border: 1.5px solid color-mix(in srgb, var(--navy) 60%, var(--line)); background: color-mix(in srgb, var(--navy) 9%, var(--surface)); color: var(--navy); }
 .btn.other-technique:hover:not(:disabled) { background: color-mix(in srgb, var(--navy) 16%, var(--surface)); border-color: var(--navy); }
+
+/* Instalar Amati (Perfil) */
+.install-card { border-color: color-mix(in srgb, var(--navy) 35%, var(--line)); }
+.install-head { align-items: flex-start; }
+.install-head h2 { margin: 0; }
+.install-head p { margin: 0.15rem 0 0; }
+.install-icon { flex: none; display: grid; place-items: center; width: 2.8rem; height: 2.8rem; border-radius: 14px; background: color-mix(in srgb, var(--navy) 16%, var(--surface)); color: var(--navy); }
+.install-ok { margin: 0; color: var(--teal); font-weight: 650; align-items: center; }
+.install-steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.6rem; counter-reset: s; }
+.install-steps li { display: flex; align-items: center; gap: 0.7rem; font-size: 0.95rem; }
+.step-ico { flex: none; display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 10px; background: var(--cream); color: var(--navy); }
+.inline-ico { vertical-align: -2px; }
+
+/* Pantallas con muesca (iPhone en horizontal) y barra de gestos: el contenido respeta las zonas seguras */
+@supports (padding: env(safe-area-inset-left)) {
+  .app-shell { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); padding-bottom: env(safe-area-inset-bottom); }
+}

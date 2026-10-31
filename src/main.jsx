@@ -18,11 +18,11 @@ import './styles/resilience.css';
 import './styles/bird.css';
 import './styles/subjects-fx.css';
 import { installRipple } from './core/lib/ripple.js';
-import { removeOldServiceWorker } from './core/lib/pwa.js';
+import { initPwa } from './core/lib/pwa.js';
 import { installChunkReload } from './core/lib/chunkReload.js';
 
 installRipple();
-removeOldServiceWorker();
+initPwa();
 installChunkReload();
 
 createRoot(document.getElementById('root')).render(

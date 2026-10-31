@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#4f5bd5" />
+    <title>Sin conexión · Amati</title>
+    <style>
+      :root { color-scheme: light dark; --bg: #f7f8fc; --card: #ffffff; --text: #1b1f3b; --muted: #646a8a; --line: #e2e4f1; --accent: #4f5bd5; --on: #ffffff; }
+      @media (prefers-color-scheme: dark) { :root { --bg: #0f1220; --card: #181c2e; --text: #e7e9f5; --muted: #8e93b0; --line: #262b45; --accent: #8b9cff; --on: #0f1220; } }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 1.25rem; background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif; }
+      main { width: min(26rem, 100%); text-align: center; padding: 2rem 1.5rem; background: var(--card); border: 1px solid var(--line); border-radius: 22px; }
+      img { width: 4.5rem; height: 4.5rem; border-radius: 18px; }
+      h1 { margin: 1rem 0 0.4rem; font-size: 1.4rem; }
+      p { margin: 0 0 1.4rem; color: var(--muted); line-height: 1.5; }
+      button { font: inherit; font-weight: 650; padding: 0.8rem 1.6rem; border: 0; border-radius: 999px; background: var(--accent); color: var(--on); cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icon-192.png" alt="" width="72" height="72" />
+      <h1>Sin conexión</h1>
+      <p>No pudimos conectar con Amati. Revisa tu internet y vuelve a intentarlo: tus materias y apuntes siguen guardados.</p>
+      <button type="button" onclick="location.reload()">Reintentar</button>
+    </main>
+  </body>
+</html>

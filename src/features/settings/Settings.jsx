@@ -4,6 +4,7 @@ import { useAuth } from '../../core/context/AuthContext.jsx';
 import { updateProfile } from '../../core/data/db.js';
 import { PRIVACY_NOTICE } from '../auth/AuthPages.jsx';
 import PomodoroSettings from './PomodoroSettings.jsx';
+import InstallApp from './InstallApp.jsx';
 import MyData from './MyData.jsx';
 import HelpCenter from '../tutorial/HelpCenter.jsx';
 import Skeleton from '../../core/components/Skeleton.jsx';
@@ -53,6 +54,8 @@ export default function Settings() {
         <p className="muted">{profile.displayName || user.email}</p>
         {isAdmin && <p><Link to="/admin" className="btn small ghost">Panel de investigación</Link></p>}
       </header>
+
+      <InstallApp />
 
       <form className="panel stack" onSubmit={save}>
         <h2 className="h3">Tus datos</h2>
